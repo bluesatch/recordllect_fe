@@ -53,6 +53,15 @@ const Albums =()=> {
     }, [])
 
     // Fetch albums when search, filters, or page changes
+    /**
+     * useCallback
+     * 
+     * memorized a function - it returns the same function reference between 
+     * renders unless one of its dependencies changes
+     * 
+     * "Only give me a new version of fetchAlbums if page, search, selectedFormat, or 
+     * selectedGenre has changed. Otherwise use the same function reference from last time"
+     */
     const fetchAlbums = useCallback(async ()=> {
         setLoading(true)
         setError(null)
