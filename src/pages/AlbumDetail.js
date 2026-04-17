@@ -53,9 +53,11 @@ const AlbumDetail =()=> {
 
                 // Check if album is in user's collection
                 if (isAuthenticated && user) {
-                    const collectionData = await api.get(`/users/${user.users_id}/albums?page=1&limit=9999`)
-                    const found = collectionData.albums?.some(a => a.album_id === albumData.album_id)
-                    setInCollection(found || false)
+                    // const collectionData = await api.get(`/users/${user.users_id}/albums?page=1&limit=9999`)
+                    // const found = collectionData.albums?.some(a => a.album_id === albumData.album_id)
+                    // setInCollection(found || false)
+                    const collectionCheck = await api.get(`/users/${user.users_id}/albums/${albumData.album_id}`)
+                    setInCollection(collectionCheck.inCollection || false)
                 }
 
             } catch (err) {

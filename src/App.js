@@ -8,6 +8,12 @@ import AlbumDetail from './pages/AlbumDetail.js'
 import Performers from './pages/Performers.js'
 import Labels from './pages/Labels.js'
 import NotFound from './pages/NotFound.js'
+import LabelDetail from './pages/LabelDetail.js'
+import UserProfile from './pages/UserProfile.js'
+import EditAlbum from './pages/EditAlbum.js'
+import EditProfile from './pages/EditProfile.js'
+import PerformerDetail from './pages/PerformerDetail.js'
+import EditPerformer from './pages/EditPerformer.js'
 
 const App =()=> {
     return (
@@ -19,8 +25,14 @@ const App =()=> {
                 <Route path='/register' element={ <Register /> } />
                 <Route path='/albums' element={ <Albums /> } />
                 <Route path='/albums/:id' element={ <AlbumDetail /> } />
+                <Route path='/albums/:id/edit' element={<EditAlbum />} />
                 <Route path='/performers' element={ <Performers /> } />
+                <Route path='/performers/:id' element={<PerformerDetail />} />
+                <Route path='/performers/:id/edit' element={<EditPerformer />} />
                 <Route path='/labels' element={ <Labels /> } />
+                <Route path='/labels/:id' element={<LabelDetail />} />
+                <Route path='/users/:id' element={<UserProfile />} />
+                <Route path='/users/:id/edit' element={<EditProfile />}/>
                 <Route path="*" element={ <NotFound /> } />
             </Routes>
         </>
