@@ -23,6 +23,7 @@ const EditPerformer = () => {
 
     const [performer, setPerformer] = useState(null)
     const [formData, setFormData] = useState({
+        performer_type: '',
         first_name: '',
         last_name: '',
         alias: '',
@@ -72,6 +73,7 @@ const EditPerformer = () => {
                 // Pre-populate based on performer type
                 if (data.performer_type === 'artist') {
                     setFormData({
+                        performer_type: data.performer_type,
                         first_name: data.first_name || '',
                         last_name: data.last_name || '',
                         alias: data.alias || '',
@@ -88,6 +90,7 @@ const EditPerformer = () => {
                     })
                 } else {
                     setFormData({
+                        performer_type: data.performer_type,
                         first_name: '',
                         last_name: '',
                         alias: '',
@@ -202,16 +205,57 @@ const EditPerformer = () => {
                 {/* Performer type — read only */}
                 <div className='alert alert-info mb-4' role='note'>
                     <small>
-                        <strong>Type:</strong> {performer.performer_type} — performer type cannot be changed
+                        <strong>Type:</strong> {formData.performer_type} — performer type cannot be changed
                     </small>
                 </div>
 
                 <form onSubmit={handleSubmit} noValidate>
                     <div className='row'>
                         <div className='col-md-8'>
+                        {/* Performer type selector - admin only */}
+                            <section aria-label='Performer type' className='mb-4'>
+                                <h3 className='h6 text-muted mb-3'>Performer Type</h3>
+                                <div className='alert alert-warning mb-3'>
+                                    <small>
+                                        <strong>Warning:</strong> Changing the performer type will
+                                        migrate their data between the artists and bands tables.
+                                        Make sure the other fields are filled in correctly before saving.
+                                    </small>
+                                </div>
+                                <div className='d-flex gap-3'>
+                                    <div className='form-check'>
+                                        <input
+                                            type='radio'
+                                            className='form-check-input'
+                                            id='type_artist'
+                                            name='performer_type'
+                                            value='artist'
+                                            checked={formData.performer_type === 'artist'}
+                                            onChange={handleChange}
+                                        />
+                                        <label className='form-check-label' htmlFor='type_artist'>
+                                            Artist
+                                        </label>
+                                    </div>
+                                    <div className='form-check'>
+                                        <input
+                                            type='radio'
+                                            className='form-check-input'
+                                            id='type_band'
+                                            name='performer_type'
+                                            value='band'
+                                            checked={formData.performer_type === 'band'}
+                                            onChange={handleChange}
+                                        />
+                                        <label className='form-check-label' htmlFor='type_band'>
+                                            Band
+                                        </label>
+                                    </div>
+                                </div>
+                            </section>
 
                             {/* Artist fields */}
-                            {performer.performer_type === 'artist' && (
+                            {formData.performer_type === 'artist' && (
                                 <section aria-label='Artist information'>
                                     <h3 className='h6 text-muted mb-3'>Artist Information</h3>
 
@@ -292,7 +336,7 @@ const EditPerformer = () => {
                             )}
 
                             {/* Band fields */}
-                            {performer.performer_type === 'band' && (
+                            {formData.performer_type === 'band' && (
                                 <section aria-label='Band information'>
                                     <h3 className='h6 text-muted mb-3'>Band Information</h3>
 
