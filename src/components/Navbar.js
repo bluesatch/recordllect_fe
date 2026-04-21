@@ -29,7 +29,7 @@ const Navbar =()=> {
             <div className='container'>
                 {/* Brand Logo */}
                 <Link className='navbar-brand' to='/'>
-                    Album App
+                    Recordllect
                 </Link>
 
                 <button

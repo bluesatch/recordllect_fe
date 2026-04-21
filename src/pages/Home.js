@@ -26,6 +26,7 @@ const Home = () => {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('added_desc')
 
     const LIMIT = 60
 
@@ -38,7 +39,7 @@ const Home = () => {
                 if (isAuthenticated && user) {
                     // Fetch user's personal collection with pagination
                     const data = await api.get(
-                        `/users/${user.users_id}/albums?page=${page}&limit=${LIMIT}`
+                        `/users/${user.users_id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`
                     )
                     setCollection(data.albums || [])
                     setTotalPages(data.totalPages || 1)
@@ -60,7 +61,7 @@ const Home = () => {
             fetchData()
         }
 
-    }, [isAuthenticated, user, loading, page])
+    }, [isAuthenticated, user, loading, page, sort])
 
     // Scroll to top when page changes
     useEffect(() => {
@@ -74,6 +75,12 @@ const Home = () => {
                 <p>Loading...</p>
             </div>
         )
+    }
+
+    // sort handler
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+        setPage(1)
     }
 
     /**
@@ -116,6 +123,25 @@ const Home = () => {
                 {/* Collection header */}
                 <div className='d-flex justify-content-between align-items-center mb-3'>
                     <h3>My Collection</h3>
+                    <div className='d-flex align-items-center gap-2'>
+                        <label className='form-label mb-0' htmlFor='sort'>Sort By</label>
+                        <select 
+                            className='form-select form-select-sm'
+                            id='sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort collection'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='added_desc'>Recently Added</option>
+                            <option value='added_asc'>Oldest Added</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='title_desc'>Title Z-A</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='year_asc'>Year - Oldest</option>
+                        </select>
+                    </div>
                     <Link to='/albums' className='btn btn-primary btn-sm'>
                         Browse Albums
                     </Link>
@@ -332,7 +358,7 @@ const Home = () => {
 
             {/* Welcome message */}
             <div className='text-center py-5'>
-                <h1>Welcome to Album App</h1>
+                <h1>Welcome to Recordllect!</h1>
                 <p className='lead text-muted'>
                     Discover, collect, and share your favorite albums.
                 </p>

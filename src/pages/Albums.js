@@ -32,6 +32,7 @@ const Albums =()=> {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('title_asc')
 
     const LIMIT = 20
 
@@ -70,6 +71,7 @@ const Albums =()=> {
             const params = new URLSearchParams({
                 page, 
                 limit: LIMIT,
+                sort,
                 ...(search && { search }),
                 ...(selectedFormat && { format: selectedFormat }),
                 ...(selectedGenre && { genre: selectedGenre })
@@ -84,7 +86,7 @@ const Albums =()=> {
         } finally {
             setLoading(false)
         }
-    }, [page, search, selectedFormat, selectedGenre])
+    }, [page, search, selectedFormat, selectedGenre, sort])
 
     useEffect(()=> {
         fetchAlbums()
@@ -131,6 +133,11 @@ const Albums =()=> {
         }
     }
 
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+        setPage(1)
+    }
+
     const hasActiveFilters = search || selectedFormat || selectedGenre
 
     return(
@@ -142,7 +149,7 @@ const Albums =()=> {
                     <div className='row g-3 align-items-end'>
 
                         {/* Search input */}
-                        <div className='col-md-4'>
+                        <div className='col-md-3'>
                             <label 
                                 className='form-label'
                                 htmlFor='search'
@@ -162,7 +169,7 @@ const Albums =()=> {
                         </div>
 
                         {/* Format filter */}
-                        <div className='col-md-3'>
+                        <div className='col-md-2'>
                             <label 
                                 className='form-label'
                                 htmlFor='format'
@@ -187,7 +194,7 @@ const Albums =()=> {
                         </div>
 
                         {/* Genre filter */}
-                        <div className='col-md-3'>
+                        <div className='col-md-2'>
                             <label
                                 className='form-label'
                                 htmlFor='genre'
@@ -211,8 +218,26 @@ const Albums =()=> {
                             </select>
                         </div>
 
+                        {/* SORT */}
+                        <div className='col-md-2'>
+                            <label className='form-label' htmlFor="sort">Sort By</label>
+                            <select 
+                                className='form-select'
+                                id='sort'
+                                name='sort'
+                                value={sort}
+                                onChange={handleSortChange}
+                                aria-label='Sort albums'
+                            >
+                                <option value='title_asc'>Title A-Z</option>
+                                <option value='title_desc'>Title Z-A</option>
+                                <option value='year_desc'>Year - Newest</option>
+                                <option value='year_asc'>Year - Oldest</option>
+                            </select>
+                        </div>
+
                         {/* Buttons */}
-                        <div className='col-md-2 d-flex gap-2'>
+                        <div className='col-md-3 d-flex gap-2'>
                             <button
                                 type='submit'
                                 className='btn btn-primary w-100'

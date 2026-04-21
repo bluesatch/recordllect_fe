@@ -23,6 +23,7 @@ const Labels = () => {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('name_asc')
 
     const LIMIT = 20
 
@@ -34,6 +35,7 @@ const Labels = () => {
             const params = new URLSearchParams({
                 page,
                 limit: LIMIT,
+                sort,
                 ...(search && { search })
             })
 
@@ -46,7 +48,7 @@ const Labels = () => {
         } finally {
             setLoading(false)
         }
-    }, [page, search])
+    }, [page, search, sort])
 
     useEffect(() => {
         fetchLabels()
@@ -68,6 +70,12 @@ const Labels = () => {
         setPage(1)
     }
 
+    // handle sort 
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+        setPage(1)
+    }
+
     return (
         <main>
             <div className='container mt-4'>
@@ -79,7 +87,7 @@ const Labels = () => {
                     <form onSubmit={handleSearch}>
                         <div className='row g-3 align-items-end'>
 
-                            <div className='col-md-9'>
+                            <div className='col-md-6'>
                                 <label className='form-label' htmlFor='search'>
                                     Search
                                 </label>
@@ -93,6 +101,26 @@ const Labels = () => {
                                     onChange={e => setSearchInput(e.target.value)}
                                     aria-label='Search labels by name'
                                 />
+                            </div>
+
+                            {/* Sort */}
+                            <div className='col-md-3'>
+                                <label className='form-label' htmlFor='sort'>
+                                    Sort By
+                                </label>
+                                <select
+                                    className='form-select'
+                                    id='sort'
+                                    name='sort'
+                                    value={sort}
+                                    onChange={handleSortChange}
+                                    aria-label='Sort labels'
+                                >
+                                    <option value='name_asc'>Name A-Z</option>
+                                    <option value='name_desc'>Name Z-A</option>
+                                    <option value='year_desc'>Founded — Newest</option>
+                                    <option value='year_asc'>Founded — Oldest</option>
+                                </select>
                             </div>
 
                             <div className='col-md-3'>

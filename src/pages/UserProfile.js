@@ -32,6 +32,7 @@ const UserProfile =()=> {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('added_desc')
 
     const LIMIT = 20
 
@@ -65,7 +66,7 @@ const UserProfile =()=> {
     useEffect(()=> {
         const fetchCollection = async ()=> {
             try {   
-                const data = await api.get(`/users/${id}/albums?page=${page}&limit=${LIMIT}`)
+                const data = await api.get(`/users/${id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`)
                 setCollection(data.albums || [])
                 setTotalPages(data.totalPages || 1)
                 setTotal(data.total || 0)
@@ -77,7 +78,7 @@ const UserProfile =()=> {
         if (activeTab === 'collection') {
             fetchCollection()
         }
-    }, [id, page, activeTab])
+    }, [id, page, activeTab, sort])
 
     useEffect(()=> {
         const fetchFollowers = async ()=> {
@@ -105,6 +106,12 @@ const UserProfile =()=> {
     useEffect(()=> {
         window.scrollTo({ top: 0, behavior: 'smooth'})
     }, [page])
+
+    // sort handler
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+        setPage(1)
+    }
 
     if (loading) {
         return (
@@ -249,16 +256,36 @@ const UserProfile =()=> {
                                 {isOwnProfile ? 'My Collection' : `${profile.first_name}'s Collection`}
                             </h3>
 
+                            <div className="d-flex align-items-center gap-2 mb-3">
+                                <label className="form-label mb-0" htmlFor="profile-sort">Sort By</label>
+                                <select 
+                                    className="form-select form-select-sm"
+                                    id='profile-sort'
+                                    name='sort'
+                                    value={sort}
+                                    onChange={handleSortChange}
+                                    aria-label='Sort collection'
+                                    style={{ width: 'auto'}}
+                                >   
+                                    <option value='added_desc'>Recently Added</option>
+                                    <option value='added_asc'>Oldest Added</option>
+                                    <option value='title_asc'>Title A - Z</option>
+                                    <option value='title_desc'>Title Z - A</option>
+                                    <option value='year_desc'>Year - Newest</option>
+                                    <option value ='year_asc'>Year - Oldest</option>
+                                </select>
+                                {isOwnProfile && (
+                                    <Link to='/albums' className='btn btn-primary btn-sm'>
+                                        Browse Albums
+                                    </Link>
+                                )}
+                            </div>
+
                             {collection.length === 0 ? (
                                 <div className='text-center mt-4'>
                                     <p className='text-muted'>
                                         No albums in collection yet.
                                     </p>
-                                    {isOwnProfile && (
-                                        <Link to='/albums' className='btn btn-primary btn-sm'>
-                                            Browse Albums
-                                        </Link>
-                                    )}
                                 </div>
                             ) : (
                                 <>

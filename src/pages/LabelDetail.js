@@ -20,6 +20,7 @@ const LabelDetail =()=> {
     const [label, setLabel] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [sort, setSort] = useState('year_asc')
 
     useEffect(()=> {
         const fetchLabel = async ()=> {
@@ -27,7 +28,7 @@ const LabelDetail =()=> {
             setError(null)
 
             try {
-                const data = await api.get(`/labels/${id}`)
+                const data = await api.get(`/labels/${id}?sort=${sort}`)
 
                 if (data.message) {
                     setError(data.message)
@@ -43,7 +44,11 @@ const LabelDetail =()=> {
         }
 
         fetchLabel()
-    }, [id])
+    }, [id, sort])
+
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+    }
 
     if (loading) {
         return (
@@ -156,6 +161,24 @@ const LabelDetail =()=> {
                 {/* Albums list */}
                 <section aria-label='Label discography'>
                     <h3 className='mb-3'>Discography</h3>
+
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                        <label className="form-label mb-0" htmlFor="label-sort">Sort By</label>
+                        <select 
+                            className="form-select form-select-sm"
+                            id='label-sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort discography'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='year_asc'>Year - Oldest</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='title_desc'>Title Z-A</option>
+                        </select>
+                    </div>
 
                     {!label.albums || label.albums.length === 0 ? (
                         <p className='text-muted'>No albums found for this label.</p>

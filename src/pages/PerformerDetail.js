@@ -32,6 +32,7 @@ const PerformerDetail =()=> {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('year_asc')
 
     const LIMIT = 20
 
@@ -67,7 +68,7 @@ const PerformerDetail =()=> {
             setAlbumsLoading(true)
 
             try {
-                const data = await api.get(`/performers/${id}/albums?page=${page}&limit=${LIMIT}`)
+                const data = await api.get(`/performers/${id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`)
 
                 setAlbums(data.albums || [])
                 setTotal(data.total || 0)
@@ -80,7 +81,7 @@ const PerformerDetail =()=> {
         }
 
         fetchAlbums()
-    }, [id, page])
+    }, [id, page, sort])
 
     useEffect(()=> {
         window.scrollTo({ top: 0, behavior: 'smooth'})
@@ -151,13 +152,18 @@ const PerformerDetail =()=> {
     ))
 
     const performerName = () => {
-    if (performer.alias) return performer.alias
-    if (performer.band_name) return performer.band_name
-    if (performer.first_name || performer.last_name) {
-        return `${performer.first_name || ''} ${performer.last_name || ''}`.trim()
+        if (performer.alias) return performer.alias
+        if (performer.band_name) return performer.band_name
+        if (performer.first_name || performer.last_name) {
+            return `${performer.first_name || ''} ${performer.last_name || ''}`.trim()
+        }
+        return 'Unknown Performer'
     }
-    return 'Unknown Performer'
-}
+
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
+        setPage(1)
+    }
 
     if (loading) {
         return (
@@ -291,6 +297,24 @@ const PerformerDetail =()=> {
                             </span>
                         )}
                     </h3>
+
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                        <label className="form-label mb-0" htmlFor="performer-sort">Sort By</label>
+                        <select 
+                            className="form-select form-select-sm"
+                            id='performer-sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort discography'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='year_asc'>Year - Oldest</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='tite_desc'>Title Z-A</option>
+                        </select>
+                    </div>
 
                     {albumsLoading ? (
                         <div className='text-center mt-4'>

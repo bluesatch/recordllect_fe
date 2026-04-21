@@ -26,6 +26,7 @@ const Performers =()=> {
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
+    const [sort, setSort] = useState('name_asc')
 
     const LIMIT = 20
 
@@ -38,6 +39,7 @@ const Performers =()=> {
             const params = new URLSearchParams({
                 page,
                 limit: LIMIT,
+                sort, 
                 ...(search && { search}),
                 ...(selectedType && { type: selectedType})
             })
@@ -52,7 +54,7 @@ const Performers =()=> {
         } finally {
             setLoading(false)
         }
-    }, [page, search, selectedType])
+    }, [page, search, selectedType, sort])
 
     useEffect(()=> {
         fetchPerformers()
@@ -77,6 +79,12 @@ const Performers =()=> {
         setSearch('')
         setSearchInput('')
         setSelectedType('')
+        setPage(1)
+    }
+
+    // sort handler
+    const handleSortChange =(e)=> {
+        setSort(e.target.value)
         setPage(1)
     }
 
@@ -121,7 +129,7 @@ const Performers =()=> {
                         <div className='row g-3 align-items-end'>
 
                             {/* Search input */}
-                            <div className='col-md-6'>
+                            <div className='col-md-5'>
                                 <label className='form-label' htmlFor='search'>
                                     Search
                                 </label>
@@ -138,7 +146,7 @@ const Performers =()=> {
                             </div>
 
                             {/* Type filter */}
-                            <div className='col-md-3'>
+                            <div className='col-md-2'>
                                 <label className='form-label' htmlFor='type'>
                                     Type
                                 </label>
@@ -153,6 +161,24 @@ const Performers =()=> {
                                     <option value=''>All Types</option>
                                     <option value='artist'>Artist</option>
                                     <option value='band'>Band</option>
+                                </select>
+                            </div>
+
+                            {/* Sort */}
+                            <div className='col-md-2'>
+                                <label className='form-label' htmlFor='sort'>
+                                    Sort By
+                                </label>
+                                <select
+                                    className='form-select'
+                                    id='sort'
+                                    name='sort'
+                                    value={sort}
+                                    onChange={handleSortChange}
+                                    aria-label='Sort performers'
+                                >
+                                    <option value='name_asc'>Name A-Z</option>
+                                    <option value='name_desc'>Name Z-A</option>
                                 </select>
                             </div>
 
@@ -204,6 +230,59 @@ const Performers =()=> {
                         </small>
                     </p>
                 )}
+
+                 {/* Pagination  */}
+                        {totalPages > 1 && (
+                            <nav aria-label='Performers pagination top' className='mt-4 mb-5'>
+                                <ul className='pagination justify-content-center'>
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={()=> setPage(1)}
+                                            disabled={page === 1}
+                                            aria-label='First page'
+                                        >
+                                            &laquo;
+                                        </button>
+                                    </li>
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className="page-link"
+                                            onClick={()=> setPage(p => p - 1)}
+                                            disabled={page === 1}
+                                            aria-label='Previous page'
+                                        >
+                                            Previous
+                                        </button>
+                                    </li>
+                                    <li className="page-item disabled">
+                                        <span className="page-link">
+                                            Page {page} of {totalPages}
+                                        </span>
+                                    </li>
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className="page-link"
+                                            onClick={()=> setPage(p => p + 1)}
+                                            disabled={page === totalPages}
+                                            aria-label='Next page'
+                                        >
+                                            Next
+                                        </button>
+                                    </li>
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className="page-link"
+                                            onClick={()=> setPage(totalPages)}
+                                            disabled={page === totalPages}
+                                            aria-label='Last page'
+                                        >
+                                            &raquo;
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        )}
 
                 {/* Performers list */}
                 {loading ? (
@@ -270,7 +349,7 @@ const Performers =()=> {
                         </div>
                         {/* Pagination  */}
                         {totalPages > 1 && (
-                            <nav aria-label='Performers pagination' className='mt-4 mb-5'>
+                            <nav aria-label='Performers pagination bottom' className='mt-4 mb-5'>
                                 <ul className='pagination justify-content-center'>
                                     <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
                                         <button
