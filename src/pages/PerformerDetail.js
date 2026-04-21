@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom"
 import { api } from "../services/api.js"
 import { useAuth } from "../context/AuthContext.js"
 
+import AlbumGrid from "../components/AlbumGrid.js"
+
 
 /**
  * 
@@ -288,101 +290,20 @@ const PerformerDetail =()=> {
                 </section>
 
                 {/* Albums section */}
-                <section aria-label='Performer discography'>
-                    <h3 className="mb-3">
-                        Discography 
-                        {total > 0 && (
-                            <span className="text-muted fs-6 ms-2">
-                                ({total} album{total !== 1 ? 's' : ''})
-                            </span>
-                        )}
-                    </h3>
-
-                    <div className="d-flex align-items-center gap-2 mb-3">
-                        <label className="form-label mb-0" htmlFor="performer-sort">Sort By</label>
-                        <select 
-                            className="form-select form-select-sm"
-                            id='performer-sort'
-                            name='sort'
-                            value={sort}
-                            onChange={handleSortChange}
-                            aria-label='Sort discography'
-                            style={{ width: 'auto'}}
-                        >
-                            <option value='year_asc'>Year - Oldest</option>
-                            <option value='year_desc'>Year - Newest</option>
-                            <option value='title_asc'>Title A-Z</option>
-                            <option value='tite_desc'>Title Z-A</option>
-                        </select>
-                    </div>
-
-                    {albumsLoading ? (
-                        <div className='text-center mt-4'>
-                            <p>Loading albums...</p>
-                        </div>
-                    ) : albums.length === 0 ? (
-                        <p className="text-muted">No albums found for this performer.</p>
-                    ) : (
-                        <>
-                            <div className='row'>
-                                {albumGrid}
-                            </div>
-
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <nav aria-label='Discography pagination' className='mt-4 mb-5'>
-                                    <ul className='pagination justify-content-center'>
-                                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                            <button
-                                                className='page-link'
-                                                onClick={() => setPage(1)}
-                                                disabled={page === 1}
-                                                aria-label='First page'
-                                            >
-                                                &laquo;
-                                            </button>
-                                        </li>
-                                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                            <button
-                                                className='page-link'
-                                                onClick={() => setPage(p => p - 1)}
-                                                disabled={page === 1}
-                                                aria-label='Previous page'
-                                            >
-                                                Previous
-                                            </button>
-                                        </li>
-                                        <li className='page-item disabled'>
-                                            <span className='page-link'>
-                                                Page {page} of {totalPages}
-                                            </span>
-                                        </li>
-                                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                            <button
-                                                className='page-link'
-                                                onClick={() => setPage(p => p + 1)}
-                                                disabled={page === totalPages}
-                                                aria-label='Next page'
-                                            >
-                                                Next
-                                            </button>
-                                        </li>
-                                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                            <button
-                                                className='page-link'
-                                                onClick={() => setPage(totalPages)}
-                                                disabled={page === totalPages}
-                                                aria-label='Last page'
-                                            >
-                                                &raquo;
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            )}         
-                        </>
-                    )}
-                </section>
+                <AlbumGrid
+                    endpoint={`/performers/${id}/albums`}
+                    defaultSort='year_asc'
+                    sortOptions={[
+                        { value: 'year_asc', label: 'Year — Oldest' },
+                        { value: 'year_desc', label: 'Year — Newest' },
+                        { value: 'title_asc', label: 'Title A-Z' },
+                        { value: 'title_desc', label: 'Title Z-A' }
+                    ]}
+                    limit={20}
+                    paginated={true}
+                    title='Discography'
+                    emptyMessage='No albums found for this performer.'
+                />
             </div>
         </main>
     )

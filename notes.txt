@@ -1,0 +1,542 @@
+-- Collection section from Home.js
+-- Replacing with AlbumGrid component
+
+ <div className='container mt-4'>
+
+                {/* Welcome heading */}
+                <h2 className='mb-4'>
+                    Welcome back, {user.first_name}!
+                </h2>
+
+                {/* Dashboard stats */}
+                <div className='row mb-4'>
+                    <div className='col-md-4 mb-3'>
+                        <div className='card text-center p-3'>
+                            <h3 className='display-6'>{total}</h3>
+                            <p className='text-muted mb-0'>Albums in Collection</p>
+                        </div>
+                    </div>
+                    <div className='col-md-4 mb-3'>
+                        <div className='card text-center p-3'>
+                            <h3 className='display-6'>{user.followers_count || 0}</h3>
+                            <p className='text-muted mb-0'>Followers</p>
+                        </div>
+                    </div>
+                    <div className='col-md-4 mb-3'>
+                        <div className='card text-center p-3'>
+                            <h3 className='display-6'>{user.following_count || 0}</h3>
+                            <p className='text-muted mb-0'>Following</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Collection header */}
+                <div className='d-flex justify-content-between align-items-center mb-3'>
+                    <h3>My Collection</h3>
+                    <div className='d-flex align-items-center gap-2'>
+                        <label className='form-label mb-0' htmlFor='sort'>Sort By</label>
+                        <select 
+                            className='form-select form-select-sm'
+                            id='sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort collection'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='added_desc'>Recently Added</option>
+                            <option value='added_asc'>Oldest Added</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='title_desc'>Title Z-A</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='year_asc'>Year - Oldest</option>
+                        </select>
+                    </div>
+                    <Link to='/albums' className='btn btn-primary btn-sm'>
+                        Browse Albums
+                    </Link>
+                </div>
+                  {/* Pagination */}
+                        {totalPages > 1 && (
+                            <nav aria-label='Collection pagination top' className='mt-4 mb-5'>
+                                <ul className='pagination justify-content-center'>
+
+                                    {/* First page */}
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(1)}
+                                            disabled={page === 1}
+                                            aria-label='First page'
+                                        >
+                                            &laquo;
+                                        </button>
+                                    </li>
+
+                                    {/* Previous page */}
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(p => p - 1)}
+                                            disabled={page === 1}
+                                            aria-label='Previous page'
+                                        >
+                                            Previous
+                                        </button>
+                                    </li>
+
+                                    {/* Page info */}
+                                    <li className='page-item disabled'>
+                                        <span className='page-link'>
+                                            Page {page} of {totalPages} &mdash; {total} albums
+                                        </span>
+                                    </li>
+
+                                    {/* Next page */}
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(p => p + 1)}
+                                            disabled={page === totalPages}
+                                            aria-label='Next page'
+                                        >
+                                            Next
+                                        </button>
+                                    </li>
+
+                                    {/* Last page */}
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(totalPages)}
+                                            disabled={page === totalPages}
+                                            aria-label='Last page'
+                                        >
+                                            &raquo;
+                                        </button>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        )}
+
+                {error && (
+                    <div className='alert alert-danger' role='alert' aria-live='polite'>
+                        {error}
+                    </div>
+                )}
+
+                {dataLoading ? (
+                    <div className='text-center mt-5'>
+                        <p>Loading your collection...</p>
+                    </div>
+                ) : collection.length === 0 && page === 1 ? (
+                    <div className='text-center mt-5'>
+                        <p className='text-muted'>Your collection is empty.</p>
+                        <Link to='/albums' className='btn btn-primary'>
+                            Browse Albums to Get Started
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* Album grid */}
+                        <div className='row'>
+                            {collection.map(album => (
+                                <div key={album.album_id} className='col-md-3 col-sm-6 mb-4'>
+                                    <div className='card h-100'>
+                                        {album.album_image_url ? (
+                                            <img
+                                                src={album.album_image_url}
+                                                alt={`${album.title} album cover`}
+                                                className='card-img-top'
+                                                style={{ objectFit: 'cover', height: '180px' }}
+                                            />
+                                        ) : (
+                                            <div
+                                                className='bg-secondary d-flex align-items-center justify-content-center'
+                                                style={{ height: '180px' }}
+                                                aria-label='No album cover available'
+                                            >
+                                                <span className='text-white'>No Image</span>
+                                            </div>
+                                        )}
+                                        <div className='card-body'>
+                                            <h4 className='card-title h6'>{album.title}</h4>
+                                            <p className='card-text text-muted mb-1'>
+                                                {album.performer_name}
+                                            </p>
+                                            <p className='card-text text-muted mb-1'>
+                                                <small>{album.release_year} | {album.format_name}</small>
+                                            </p>
+                                            {album.label_name && (
+                                                <p className='card-text text-muted mb-0'>
+                                                    <small>{album.label_name}</small>
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className='card-footer d-flex justify-content-between'>
+                                            <Link
+                                                to={`/albums/${album.album_id}`}
+                                                className='btn btn-outline-primary btn-sm'
+                                            >
+                                                View
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <nav aria-label='Collection pagination bottom' className='mt-4 mb-5'>
+                                <ul className='pagination justify-content-center'>
+
+                                    {/* First page */}
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(1)}
+                                            disabled={page === 1}
+                                            aria-label='First page'
+                                        >
+                                            &laquo;
+                                        </button>
+                                    </li>
+
+                                    {/* Previous page */}
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(p => p - 1)}
+                                            disabled={page === 1}
+                                            aria-label='Previous page'
+                                        >
+                                            Previous
+                                        </button>
+                                    </li>
+
+                                    {/* Page info */}
+                                    <li className='page-item disabled'>
+                                        <span className='page-link'>
+                                            Page {page} of {totalPages} &mdash; {total} albums
+                                        </span>
+                                    </li>
+
+                                    {/* Next page */}
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(p => p + 1)}
+                                            disabled={page === totalPages}
+                                            aria-label='Next page'
+                                        >
+                                            Next
+                                        </button>
+                                    </li>
+
+                                    {/* Last page */}
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className='page-link'
+                                            onClick={() => setPage(totalPages)}
+                                            disabled={page === totalPages}
+                                            aria-label='Last page'
+                                        >
+                                            &raquo;
+                                        </button>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        )}
+                    </>
+                )}
+
+            </div>
+
+    -- END
+
+    -- UserProfile
+
+    <h3 className='mb-3'>
+                                {isOwnProfile ? 'My Collection' : `${profile.first_name}'s Collection`}
+                            </h3>
+
+                            <div className="d-flex align-items-center gap-2 mb-3">
+                                <label className="form-label mb-0" htmlFor="profile-sort">Sort By</label>
+                                <select 
+                                    className="form-select form-select-sm"
+                                    id='profile-sort'
+                                    name='sort'
+                                    value={sort}
+                                    onChange={handleSortChange}
+                                    aria-label='Sort collection'
+                                    style={{ width: 'auto'}}
+                                >   
+                                    <option value='added_desc'>Recently Added</option>
+                                    <option value='added_asc'>Oldest Added</option>
+                                    <option value='title_asc'>Title A - Z</option>
+                                    <option value='title_desc'>Title Z - A</option>
+                                    <option value='year_desc'>Year - Newest</option>
+                                    <option value ='year_asc'>Year - Oldest</option>
+                                </select>
+                                {isOwnProfile && (
+                                    <Link to='/albums' className='btn btn-primary btn-sm'>
+                                        Browse Albums
+                                    </Link>
+                                )}
+                            </div>
+
+                            {collection.length === 0 ? (
+                                <div className='text-center mt-4'>
+                                    <p className='text-muted'>
+                                        No albums in collection yet.
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className='row'>
+                                        {collection.map(album => (
+                                            <div key={album.album_id} className='col-md-3 col-sm-6 mb-4'>
+                                                <div className='card h-100'>
+                                                    {album.album_image_url ? (
+                                                        <img 
+                                                            src={album.album_image_url}
+                                                            alt={`${album.title} album cover`}
+                                                            className='card-img-top'
+                                                            style={{ objectFit: 'cover', height: '180px'}}
+                                                        />
+                                                    ) : (
+                                                        <div 
+                                                            className='bg-secondary d-flex align-items-center justify-content-center'
+                                                            style={{ height: '180px'}}
+                                                            arial-label='No album cover available'
+                                                        >
+                                                            <span className='text-white'>No Image</span>
+                                                        </div>
+                                                    )}
+                                                    <div className='card-body'>
+                                                        <h4 className='card-title h6'>{album.title}</h4>
+                                                        <p className='card-text text-muted mb-1'>
+                                                            {album.performer_name}
+                                                        </p>
+                                                        <p className='card-text text-muted mb-0'>
+                                                            <small>{album.release_year} | {album.format_name}</small>
+                                                        </p>
+                                                    </div>
+                                                    <footer className='card-footer'>
+                                                        <Link 
+                                                            to={`/albums/${album.album_id}`}
+                                                            className='btn btn-outline-primary btn-sm w-100'
+                                                        >
+                                                            View
+                                                        </Link>
+                                                    </footer>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Pagination */}
+                                    {totalPages > 1 && (
+                                        <nav aria-label='Collection pagination' className='mt-4 mb-5'>
+                                            <ul className='pagination justify-content-center'>
+                                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                                    <button
+                                                        className='page-link'
+                                                        onClick={()=> setPage(1)}
+                                                        disabled={page=== 1}
+                                                        aria-label="First page"
+                                                    >
+                                                        &laquo;
+                                                    </button>
+                                                </li>
+                                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                                    <button 
+                                                        className='page-link'
+                                                        onClick={()=> setPage(p => p -1)}
+                                                        disabled={page === 1}
+                                                        aria-label='Previous page'
+                                                    >
+                                                        Previous
+                                                    </button>
+                                                </li>
+                                                <li className='page-item disabled'>
+                                                    <span className='page-link'>
+                                                        Page {page} of {totalPages}
+                                                    </span>
+                                                </li>
+                                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                                    <button
+                                                        className='page-link'
+                                                        onClick={()=> setPage(p => p + 1)}
+                                                        disabled={page === totalPages}
+                                                        aria-label='Next page'
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </li>
+                                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                                    <button
+                                                        className='page-link'
+                                                        onClick={()=> setPage(totalPages)}
+                                                        disabled={page === totalPages}
+                                                        aria-label='Last page'
+                                                    >
+                                                        &raquo;
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    )}
+                                </>
+                            )}
+
+    -- End
+
+
+    -- PerformerDetail 
+
+    <section aria-label='Performer discography'>
+                    <h3 className="mb-3">
+                        Discography 
+                        {total > 0 && (
+                            <span className="text-muted fs-6 ms-2">
+                                ({total} album{total !== 1 ? 's' : ''})
+                            </span>
+                        )}
+                    </h3>
+
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                        <label className="form-label mb-0" htmlFor="performer-sort">Sort By</label>
+                        <select 
+                            className="form-select form-select-sm"
+                            id='performer-sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort discography'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='year_asc'>Year - Oldest</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='tite_desc'>Title Z-A</option>
+                        </select>
+                    </div>
+
+                    {albumsLoading ? (
+                        <div className='text-center mt-4'>
+                            <p>Loading albums...</p>
+                        </div>
+                    ) : albums.length === 0 ? (
+                        <p className="text-muted">No albums found for this performer.</p>
+                    ) : (
+                        <>
+                            <div className='row'>
+                                {albumGrid}
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <nav aria-label='Discography pagination' className='mt-4 mb-5'>
+                                    <ul className='pagination justify-content-center'>
+                                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                            <button
+                                                className='page-link'
+                                                onClick={() => setPage(1)}
+                                                disabled={page === 1}
+                                                aria-label='First page'
+                                            >
+                                                &laquo;
+                                            </button>
+                                        </li>
+                                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                            <button
+                                                className='page-link'
+                                                onClick={() => setPage(p => p - 1)}
+                                                disabled={page === 1}
+                                                aria-label='Previous page'
+                                            >
+                                                Previous
+                                            </button>
+                                        </li>
+                                        <li className='page-item disabled'>
+                                            <span className='page-link'>
+                                                Page {page} of {totalPages}
+                                            </span>
+                                        </li>
+                                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                            <button
+                                                className='page-link'
+                                                onClick={() => setPage(p => p + 1)}
+                                                disabled={page === totalPages}
+                                                aria-label='Next page'
+                                            >
+                                                Next
+                                            </button>
+                                        </li>
+                                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                            <button
+                                                className='page-link'
+                                                onClick={() => setPage(totalPages)}
+                                                disabled={page === totalPages}
+                                                aria-label='Last page'
+                                            >
+                                                &raquo;
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            )}         
+                        </>
+                    )}
+                </section>
+
+-- End 
+
+-- LabelDetail 
+
+<section aria-label='Label discography'>
+                    <h3 className='mb-3'>Discography</h3>
+
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                        <label className="form-label mb-0" htmlFor="label-sort">Sort By</label>
+                        <select 
+                            className="form-select form-select-sm"
+                            id='label-sort'
+                            name='sort'
+                            value={sort}
+                            onChange={handleSortChange}
+                            aria-label='Sort discography'
+                            style={{ width: 'auto'}}
+                        >
+                            <option value='year_asc'>Year - Oldest</option>
+                            <option value='year_desc'>Year - Newest</option>
+                            <option value='title_asc'>Title A-Z</option>
+                            <option value='title_desc'>Title Z-A</option>
+                        </select>
+                    </div>
+
+                    {!label.albums || label.albums.length === 0 ? (
+                        <p className='text-muted'>No albums found for this label.</p>
+                    ) : (
+                        <div className='table-responsive'>
+                            <table className='table table-hover' aria-label='Albums on this label'>
+                                <thead>
+                                    <tr>
+                                        <th scope='col'>Title</th>
+                                        <th scope='col'>Performer</th>
+                                        <th scope='col'>Year</th>
+                                        <th scope='col'>Format</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {albumRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </section>
+
+-- End

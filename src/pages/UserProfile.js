@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from "../context/AuthContext.js"
 import { api } from "../services/api.js"
 
+import AlbumGrid from "../components/AlbumGrid.js"
+
 /**
  * UserProfile - User profile page
  * 
@@ -252,138 +254,23 @@ const UserProfile =()=> {
                     {/* Collection tab */}
                     {activeTab === 'collection' && (
                         <>
-                            <h3 className='mb-3'>
-                                {isOwnProfile ? 'My Collection' : `${profile.first_name}'s Collection`}
-                            </h3>
-
-                            <div className="d-flex align-items-center gap-2 mb-3">
-                                <label className="form-label mb-0" htmlFor="profile-sort">Sort By</label>
-                                <select 
-                                    className="form-select form-select-sm"
-                                    id='profile-sort'
-                                    name='sort'
-                                    value={sort}
-                                    onChange={handleSortChange}
-                                    aria-label='Sort collection'
-                                    style={{ width: 'auto'}}
-                                >   
-                                    <option value='added_desc'>Recently Added</option>
-                                    <option value='added_asc'>Oldest Added</option>
-                                    <option value='title_asc'>Title A - Z</option>
-                                    <option value='title_desc'>Title Z - A</option>
-                                    <option value='year_desc'>Year - Newest</option>
-                                    <option value ='year_asc'>Year - Oldest</option>
-                                </select>
-                                {isOwnProfile && (
-                                    <Link to='/albums' className='btn btn-primary btn-sm'>
-                                        Browse Albums
-                                    </Link>
-                                )}
-                            </div>
-
-                            {collection.length === 0 ? (
-                                <div className='text-center mt-4'>
-                                    <p className='text-muted'>
-                                        No albums in collection yet.
-                                    </p>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className='row'>
-                                        {collection.map(album => (
-                                            <div key={album.album_id} className='col-md-3 col-sm-6 mb-4'>
-                                                <div className='card h-100'>
-                                                    {album.album_image_url ? (
-                                                        <img 
-                                                            src={album.album_image_url}
-                                                            alt={`${album.title} album cover`}
-                                                            className='card-img-top'
-                                                            style={{ objectFit: 'cover', height: '180px'}}
-                                                        />
-                                                    ) : (
-                                                        <div 
-                                                            className='bg-secondary d-flex align-items-center justify-content-center'
-                                                            style={{ height: '180px'}}
-                                                            arial-label='No album cover available'
-                                                        >
-                                                            <span className='text-white'>No Image</span>
-                                                        </div>
-                                                    )}
-                                                    <div className='card-body'>
-                                                        <h4 className='card-title h6'>{album.title}</h4>
-                                                        <p className='card-text text-muted mb-1'>
-                                                            {album.performer_name}
-                                                        </p>
-                                                        <p className='card-text text-muted mb-0'>
-                                                            <small>{album.release_year} | {album.format_name}</small>
-                                                        </p>
-                                                    </div>
-                                                    <footer className='card-footer'>
-                                                        <Link 
-                                                            to={`/albums/${album.album_id}`}
-                                                            className='btn btn-outline-primary btn-sm w-100'
-                                                        >
-                                                            View
-                                                        </Link>
-                                                    </footer>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {/* Pagination */}
-                                    {totalPages > 1 && (
-                                        <nav aria-label='Collection pagination' className='mt-4 mb-5'>
-                                            <ul className='pagination justify-content-center'>
-                                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                                    <button
-                                                        className='page-link'
-                                                        onClick={()=> setPage(1)}
-                                                        disabled={page=== 1}
-                                                        aria-label="First page"
-                                                    >
-                                                        &laquo;
-                                                    </button>
-                                                </li>
-                                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                                    <button 
-                                                        className='page-link'
-                                                        onClick={()=> setPage(p => p -1)}
-                                                        disabled={page === 1}
-                                                        aria-label='Previous page'
-                                                    >
-                                                        Previous
-                                                    </button>
-                                                </li>
-                                                <li className='page-item disabled'>
-                                                    <span className='page-link'>
-                                                        Page {page} of {totalPages}
-                                                    </span>
-                                                </li>
-                                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                                    <button
-                                                        className='page-link'
-                                                        onClick={()=> setPage(p => p + 1)}
-                                                        disabled={page === totalPages}
-                                                        aria-label='Next page'
-                                                    >
-                                                        Next
-                                                    </button>
-                                                </li>
-                                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                                    <button
-                                                        className='page-link'
-                                                        onClick={()=> setPage(totalPages)}
-                                                        disabled={page === totalPages}
-                                                        aria-label='Last page'
-                                                    >
-                                                        &raquo;
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </nav>
-                                    )}
-                                </>
-                            )}
+                            <AlbumGrid 
+                                endpoint={`/users/${id}/albums`}
+                                defaultSort='added_desc'
+                                sortOptions={[
+                                    { value: 'added_desc', label: 'Recently Added' },
+                                    { value: 'added_asc', label: 'Oldest Added' },
+                                    { value: 'title_asc', label: 'Title A-Z' },
+                                    { value: 'title_desc', label: 'Title Z-A' },
+                                    { value: 'year_desc', label: 'Year — Newest' },
+                                    { value: 'year_asc', label: 'Year — Oldest' }
+                                ]}
+                                limit={20}
+                                paginated={true}
+                                title={isOwnProfile ? 'My Collection' : `{profile.first_name}'s Collection`}
+                                showBrowseButton={isOwnProfile}
+                                emptyMessage="No albums in collection yet."
+                            />
                         </>
                     )}
 
