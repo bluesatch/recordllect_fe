@@ -25,17 +25,17 @@ const UserProfile =()=> {
 
     // STATE
     const [profile, setProfile] = useState(null)
-    const [collection, setCollection] = useState([])
+    // const [collection, setCollection] = useState([])
     const [followers, setFollowers] = useState([])
     const [following, setFollowing] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [activeTab, setActiveTab] = useState('collection')
 
-    const [page, setPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(1)
-    const [total, setTotal] = useState(0)
-    const [sort, setSort] = useState('added_desc')
+    // const [page, setPage] = useState(1)
+    // const [totalPages, setTotalPages] = useState(1)
+    // const [total, setTotal] = useState(0)
+    // const [sort, setSort] = useState('added_desc')
 
     const [isFollowing, setIsFollowing] = useState(false)
     const [followLoading, setFollowLoading] = useState(false)
@@ -74,22 +74,22 @@ const UserProfile =()=> {
         fetchProfile()
     }, [id])
 
-    useEffect(()=> {
-        const fetchCollection = async ()=> {
-            try {   
-                const data = await api.get(`/users/${id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`)
-                setCollection(data.albums || [])
-                setTotalPages(data.totalPages || 1)
-                setTotal(data.total || 0)
-            } catch (err) {
-                console.error('Failed to load collection:', err)
-            }
-        }
+    // useEffect(()=> {
+    //     const fetchCollection = async ()=> {
+    //         try {   
+    //             const data = await api.get(`/users/${id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`)
+    //             setCollection(data.albums || [])
+    //             setTotalPages(data.totalPages || 1)
+    //             setTotal(data.total || 0)
+    //         } catch (err) {
+    //             console.error('Failed to load collection:', err)
+    //         }
+    //     }
 
-        if (activeTab === 'collection') {
-            fetchCollection()
-        }
-    }, [id, page, activeTab, sort])
+    //     if (activeTab === 'collection') {
+    //         fetchCollection()
+    //     }
+    // }, [id, page, activeTab, sort])
 
     useEffect(()=> {
         const fetchFollowers = async ()=> {
@@ -114,9 +114,9 @@ const UserProfile =()=> {
         if (activeTab === 'following') fetchFollowing()
     }, [id, activeTab])
 
-    useEffect(()=> {
-        window.scrollTo({ top: 0, behavior: 'smooth'})
-    }, [page])
+    // useEffect(()=> {
+    //     window.scrollTo({ top: 0, behavior: 'smooth'})
+    // }, [page])
 
     useEffect(()=> {
         const checkFollowing = async ()=> {
@@ -138,10 +138,10 @@ const UserProfile =()=> {
     // HANDLERS 
 
     // sort handler
-    const handleSortChange =(e)=> {
-        setSort(e.target.value)
-        setPage(1)
-    }
+    // const handleSortChange =(e)=> {
+    //     setSort(e.target.value)
+    //     setPage(1)
+    // }
 
     // follow/unfollow
     const handleFollow = async ()=> {
@@ -160,7 +160,7 @@ const UserProfile =()=> {
                 setIsFollowing(true)
                 setProfile(prevProfile => ({
                     ...prevProfile,
-                    followersCount: prevProfile.followers_count + 1
+                    followers_count: prevProfile.followers_count + 1
                 }))
             }
         } catch (err) {
@@ -315,7 +315,7 @@ const UserProfile =()=> {
                                 tabIndex={0}
                                 onKeyDown={e => e.key === 'Enter' && setActiveTab('collection')} 
                             >
-                                <h3 className='display-6'>{total}</h3>
+                                <h3 className='display-6'>{profile.album_count || 0}</h3>
                                 <p className='text-muted mb-0'>Albums</p>
                             </div>
                         </div>

@@ -143,6 +143,7 @@ const Register = () => {
                                 type='text'
                                 className='form-control'
                                 id='username'
+                                name="username"
                                 value={formData.username}
                                 onChange={handleChange}
                                 autoComplete='username'
