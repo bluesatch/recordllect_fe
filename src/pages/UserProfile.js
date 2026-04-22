@@ -5,6 +5,8 @@ import { api } from "../services/api.js"
 
 import AlbumGrid from "../components/AlbumGrid.js"
 import Pagination from "../components/Pagination.js"
+import StatCard from "../components/StatCard.js"
+import UserCard from "../components/UserCard.js"
 
 /**
  * UserProfile - User profile page
@@ -305,49 +307,30 @@ const UserProfile =()=> {
                 {/* Stats */}
                 <section aria-label='Profile statistics'>
                     <div className='row mb-4'>
-                        <div className='col-4'>
-                            <div
-                                className='card text-center p-3'
-                                style={{ cursor: 'pointer'}}
+                        <div className="col-4">
+                            <StatCard 
+                                value={profile.album_count || 0}
+                                label='Albums'
                                 onClick={()=> setActiveTab('collection')}
-                                role='button'
-                                aria-pressed={activeTab === 'collection'}
-                                tabIndex={0}
-                                onKeyDown={e => e.key === 'Enter' && setActiveTab('collection')} 
-                            >
-                                <h3 className='display-6'>{profile.album_count || 0}</h3>
-                                <p className='text-muted mb-0'>Albums</p>
-                            </div>
+                                isActive={activeTab === 'collection'}
+                            />
                         </div>
-                        <div className='col-4'>
-                            <div 
-                                className='card text-center p-3'
-                                style={{ cursor: 'pointer'}}
+                        <div className="col-4">
+                            <StatCard 
+                                value={profile.followers_count || 0}
+                                label='Followers'
                                 onClick={()=> setActiveTab('followers')}
-                                role='button'
-                                aria-pressed={activeTab === 'followers'}
-                                tabIndex={0}
-                                onKeyDown={e => e.key === 'Enter' && setActiveTab('followers')}
-                            >
-                                <h3 className='display-6'>{profile.followers_count || 0}</h3>
-                                <p className='text-muted mb-0'>Followers</p>
-                            </div>
+                                isActive={activeTab === 'followers'}
+                            />
                         </div>
-                        <div className='col-4'>
-                            <div 
-                                className='card text-center p-3'
-                                style={{ cursor: 'pointer'}}
+                        <div className="col-4">
+                            <StatCard 
+                                value={profile.following_count || 0}
+                                label='Following'
                                 onClick={()=> setActiveTab('following')}
-                                role='button'
-                                aria-pressed={activeTab === 'following'}
-                                tabIndex={0}
-                                onKeyDown={e => e.key === 'Enter' && setActiveTab('following')}
-                            >
-                                <h3 className='display-6'>{profile.following_count || 0}</h3>
-                                <p className='text-muted mb-0'>Following</p>
-                            </div>
+                                isActive={activeTab === 'following'}
+                            />
                         </div>
-                        {/* End row */}
                     </div>
                 </section>
 
@@ -472,30 +455,8 @@ const UserProfile =()=> {
                             ) : (
                                 <div className='row'>
                                     {followers.map(follower => (
-                                        <div key={follower.users_id} className='col-md-4 col-sm-6 mb-3'>
-                                            <div className='card'>
-                                                <div className='card-body d-flex align-items-center gap-3'>
-                                                    <div 
-                                                        className='rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0'
-                                                        style={{ width: '44px', height: '44px' }}
-                                                        aria-hidden='true'
-                                                    >
-                                                        <span className='text-white'>
-                                                            {follower.username?.charAt(0)}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <Link 
-                                                            to={`/users/${follower.users_id}`}
-                                                            className='text-decoration-none'
-                                                        >
-                                                            <p className='mb-0 fw-500'>
-                                                                {follower.username}
-                                                            </p>
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div key={follower.users_id} className="col-md-4 col-sm-6 mb-3">
+                                            <UserCard user={follower} />
                                         </div>
                                     ))}
                                 </div>
@@ -512,30 +473,8 @@ const UserProfile =()=> {
                             ) : (
                                 <div className='row'>
                                     {following.map(followed => (
-                                        <div key={followed.users_id} className='col-md-4 col-sm-6 mb-3'>
-                                            <div className='card'>
-                                                <div className='card-body d-flex align-items-center gap-3'>
-                                                    <div 
-                                                        className='rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0'
-                                                        style={{ width: '44px', height: '44px' }}
-                                                        aria-hidden='true'
-                                                    >
-                                                        <span className='text-white'>
-                                                            {followed.username?.charAt(0)}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <Link 
-                                                            to={`/users/${followed.users_id}`}
-                                                            className='text-decoration-none'
-                                                        >
-                                                            <p className='mb-0 fw-500'>
-                                                                {followed.username} 
-                                                            </p>
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div key={followed.users_id} className="col-md-4 col-sm-6 mb-3">
+                                            <UserCard user={followed} />
                                         </div>
                                     ))}
                                 </div>

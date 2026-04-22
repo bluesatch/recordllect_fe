@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.js'
 import { api } from '../services/api.js'
 
 import AlbumGrid from '../components/AlbumGrid.js'
+import StatCard from '../components/StatCard.js'
 
 /**
  * Home - Landing page
@@ -74,23 +75,17 @@ const Home = () => {
 
                 {/* Dashboard stats */}
                 <div className='row mb-4'>
-                    {/* <div className='col-md-4 mb-3'>
-                        <div className='card text-center p-3'>
-                            <h3 className='display-6'>{total}</h3>
-                            <p className='text-muted mb-0'>Albums in Collection</p>
-                        </div>
-                    </div> */}
                     <div className='col-md-6 mb-3'>
-                        <div className='card text-center p-3'>
-                            <h3 className='display-6'>{user.followers_count || 0}</h3>
-                            <p className='text-muted mb-0'>Followers</p>
-                        </div>
+                        <StatCard 
+                            value={user.followers_count || 0}
+                            label='Followers'
+                        />
                     </div>
                     <div className='col-md-6 mb-3'>
-                        <div className='card text-center p-3'>
-                            <h3 className='display-6'>{user.following_count || 0}</h3>
-                            <p className='text-muted mb-0'>Following</p>
-                        </div>
+                        <StatCard 
+                            value={user.following_count || 0}
+                            label='Following'
+                        />
                     </div>
                 </div>
                 <AlbumGrid 
