@@ -25,6 +25,7 @@ const EditProfile =()=> {
 
     // STATE
     const [formData, setFormData] = useState({
+        username: '',
         first_name: '',
         last_name: '',
         address_line_1: '',
@@ -69,6 +70,7 @@ const EditProfile =()=> {
                 }
 
                 setFormData({
+                    username: data.username || '',
                     first_name: data.first_name || '',
                     last_name: data.last_name || '',
                     address_line_1: data.address_line_1 || '',
@@ -167,6 +169,22 @@ const EditProfile =()=> {
                                 <h3 className='h6 text-muted mb-3'>Personal Info</h3>
 
                                 <div className='row'>
+
+                                    <div className='mb-3'>
+                                        <label className="form-label" htmlFor="username">Username</label>
+                                        <input 
+                                            type='text'
+                                            className="form-control"
+                                            id='username'
+                                            name='username'
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            autoComplete="username"
+                                        />
+                                        <div className='form-text'>
+                                            Letters, numbers, and underscores only. 3-50 characters.
+                                        </div>
+                                    </div>
                                     <div className='col-md-6 mb-3'>
                                         <label className='form-label' htmlFor="first_name">First Name</label>
                                         <input 

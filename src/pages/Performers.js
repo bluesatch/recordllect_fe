@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Link } from 'react-router-dom'
 import { api } from '../services/api.js'
 
+import Pagination from "../components/Pagination.js"
 /**
  * Performers - Global performers catalog
  * 
@@ -232,57 +233,14 @@ const Performers =()=> {
                 )}
 
                  {/* Pagination  */}
-                        {totalPages > 1 && (
-                            <nav aria-label='Performers pagination top' className='mt-4 mb-5'>
-                                <ul className='pagination justify-content-center'>
-                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                        <button
-                                            className='page-link'
-                                            onClick={()=> setPage(1)}
-                                            disabled={page === 1}
-                                            aria-label='First page'
-                                        >
-                                            &laquo;
-                                        </button>
-                                    </li>
-                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(p => p - 1)}
-                                            disabled={page === 1}
-                                            aria-label='Previous page'
-                                        >
-                                            Previous
-                                        </button>
-                                    </li>
-                                    <li className="page-item disabled">
-                                        <span className="page-link">
-                                            Page {page} of {totalPages}
-                                        </span>
-                                    </li>
-                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(p => p + 1)}
-                                            disabled={page === totalPages}
-                                            aria-label='Next page'
-                                        >
-                                            Next
-                                        </button>
-                                    </li>
-                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(totalPages)}
-                                            disabled={page === totalPages}
-                                            aria-label='Last page'
-                                        >
-                                            &raquo;
-                                        </button>
-                                    </li>
-                                </ul>
-                            </nav>
-                        )}
+                    {totalPages > 1 && (
+                        <Pagination 
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                            label='Album pagination'
+                        />
+                    )}
 
                 {/* Performers list */}
                 {loading ? (
@@ -349,55 +307,12 @@ const Performers =()=> {
                         </div>
                         {/* Pagination  */}
                         {totalPages > 1 && (
-                            <nav aria-label='Performers pagination bottom' className='mt-4 mb-5'>
-                                <ul className='pagination justify-content-center'>
-                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                        <button
-                                            className='page-link'
-                                            onClick={()=> setPage(1)}
-                                            disabled={page === 1}
-                                            aria-label='First page'
-                                        >
-                                            &laquo;
-                                        </button>
-                                    </li>
-                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(p => p - 1)}
-                                            disabled={page === 1}
-                                            aria-label='Previous page'
-                                        >
-                                            Previous
-                                        </button>
-                                    </li>
-                                    <li className="page-item disabled">
-                                        <span className="page-link">
-                                            Page {page} of {totalPages}
-                                        </span>
-                                    </li>
-                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(p => p + 1)}
-                                            disabled={page === totalPages}
-                                            aria-label='Next page'
-                                        >
-                                            Next
-                                        </button>
-                                    </li>
-                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={()=> setPage(totalPages)}
-                                            disabled={page === totalPages}
-                                            aria-label='Last page'
-                                        >
-                                            &raquo;
-                                        </button>
-                                    </li>
-                                </ul>
-                            </nav>
+                            <Pagination 
+                                page={page}
+                                totalPages={totalPages}
+                                onPageChange={setPage}
+                                label='Album pagination'
+                            />
                         )}
                     </>
                 )}

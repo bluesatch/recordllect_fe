@@ -3,6 +3,8 @@ import { Link } from "react-router-dom"
 import { api } from "../services/api.js"
 import { useAuth } from '../context/AuthContext.js'
 
+import Pagination from "./Pagination.js"
+
 /**
  * Album Grid - Reusable album grid component
  * 
@@ -198,6 +200,15 @@ const AlbumGrid =({
                         </h3>
                     )}
                 </div>
+                {/* Pagination */}
+                    {paginated && (
+                        <Pagination 
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                            label='Album pagination'
+                        />
+                    )}
                 <div className="d-flex align-items-center gap-2">
                     <label className="form-label mb-0" htmlFor={`sort-${endpoint}`}>Sort By</label>
                     <select 
@@ -243,56 +254,13 @@ const AlbumGrid =({
                     </div>
 
                     {/* Pagination */}
-                    {paginated && totalPages > 1 && (
-                        <nav aria-label='Album pagination' className="mt-4 mb-5">
-                            <ul className="pagination justify-content-center">
-                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link"
-                                        onClick={()=> setPage(1)}
-                                        disabled={page === 1}
-                                        aria-label='First page'
-                                    >
-                                        &laquo;
-                                    </button>
-                                </li>
-                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link"
-                                        onClick={()=> setPage(p => p - 1)}
-                                        disabled={page === 1}
-                                        aria-label='Previous page'
-                                    >
-                                        Previous
-                                    </button>
-                                </li>
-                                <li className="page-item disabled">
-                                    <span className="page-link">
-                                        Page {page} of {totalPages}
-                                    </span>
-                                </li>
-                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link"
-                                        onClick={()=> setPage(p => p + 1)}
-                                        disabled={page === totalPages}
-                                        aria-label="Next page"
-                                    >
-                                        Next
-                                    </button>
-                                </li>
-                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
-                                    <button 
-                                        className="page-link"
-                                        onClick={()=> setPage(totalPages)}
-                                        disabled={page === totalPages}
-                                        aria-label='Last page'
-                                    >
-                                        &raquo;
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
+                    {paginated && (
+                        <Pagination 
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                            label='Album pagination'
+                        />
                     )}
                 </>
             )}

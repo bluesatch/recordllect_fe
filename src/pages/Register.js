@@ -20,6 +20,7 @@ const Register = () => {
         first_name: '',
         last_name: '',
         email: '',
+        username: '',
         password: '',
         address_line_1: '',
         address_line_2: '',
@@ -134,6 +135,20 @@ const Register = () => {
                                 onChange={handleChange}
                                 autoComplete='email'
                                 required
+                            />
+                        </div>
+                        <div className='mb-3'>
+                            <label className='form-label' htmlFor='username'>Username</label>
+                            <input 
+                                type='text'
+                                className='form-control'
+                                id='username'
+                                value={formData.username}
+                                onChange={handleChange}
+                                autoComplete='username'
+                                required
+                                aria-required='true'
+                                placeholder='Letters, numbers, and underscores only'
                             />
                         </div>
 

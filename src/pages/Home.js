@@ -69,7 +69,7 @@ const Home = () => {
 
                 {/* Welcome heading */}
                 <h2 className='mb-4'>
-                    Welcome back, {user.first_name}!
+                    Welcome back, {user.username}!
                 </h2>
 
                 {/* Dashboard stats */}

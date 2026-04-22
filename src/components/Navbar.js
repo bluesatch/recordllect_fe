@@ -71,9 +71,9 @@ const Navbar =()=> {
                                     <Link   
                                         className='nav-link'
                                         to={`/users/${user.users_id}`}
-                                        aria-label={`View profile for ${user.first_name} ${user.last_name}`}
+                                        aria-label={`View profile for ${user.username}`}
                                     >
-                                        {user.first_name} {user.last_name} 
+                                        {user.username}
                                         {user.is_admin === 1 && (
                                             <span className='badge bg-warning text-dark ms-2'>
                                                 Admin

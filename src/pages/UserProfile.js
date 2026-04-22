@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext.js"
 import { api } from "../services/api.js"
 
 import AlbumGrid from "../components/AlbumGrid.js"
+import Pagination from "../components/Pagination.js"
 
 /**
  * UserProfile - User profile page
@@ -36,9 +37,17 @@ const UserProfile =()=> {
     const [total, setTotal] = useState(0)
     const [sort, setSort] = useState('added_desc')
 
+    const [isFollowing, setIsFollowing] = useState(false)
+    const [followLoading, setFollowLoading] = useState(false)
+    const [userSearch, setUserSearch] = useState('')
+    const [userSearchResults, setUserSearchResults] = useState([])
+    const [searchLoading, setSearchLoading] = useState(false)
+
     const LIMIT = 20
 
     const isOwnProfile = isAuthenticated && currentUser?.users_id === parseInt(id)
+
+    // useEffects 
 
     useEffect(()=> {
         const fetchProfile = async ()=> {
@@ -109,10 +118,81 @@ const UserProfile =()=> {
         window.scrollTo({ top: 0, behavior: 'smooth'})
     }, [page])
 
+    useEffect(()=> {
+        const checkFollowing = async ()=> {
+            if (!isAuthenticated || isOwnProfile) return 
+
+            try {
+                const data = await api.get(`/users/${id}/following/check`)
+                setIsFollowing(data.isFollowing)
+            } catch (err) {
+                console.error('Failed to check following status:', err)
+            }
+        }
+
+        if (profile) {
+            checkFollowing()
+        }
+    }, [id, isAuthenticated, isOwnProfile, profile])
+
+    // HANDLERS 
+
     // sort handler
     const handleSortChange =(e)=> {
         setSort(e.target.value)
         setPage(1)
+    }
+
+    // follow/unfollow
+    const handleFollow = async ()=> {
+        setFollowLoading(true)
+
+        try {
+            if (isFollowing) {
+                await api.delete(`/users/${id}/follow`)
+                setIsFollowing(false)
+                setProfile(prevProfile => ({
+                    ...prevProfile,
+                    followers_count: prevProfile.followers_count - 1
+                }))
+            } else {
+                await api.post(`/users/${id}/follow`)
+                setIsFollowing(true)
+                setProfile(prevProfile => ({
+                    ...prevProfile,
+                    followersCount: prevProfile.followers_count + 1
+                }))
+            }
+        } catch (err) {
+            console.error('Failed to follow/unfollow:', err)
+        } finally {
+            setFollowLoading(false)
+        }
+    }
+
+    // search users 
+    const handleUserSearch = async (e)=> {
+        e.preventDefault()
+
+        if (!userSearch.trim()) return 
+
+        setSearchLoading(true)
+
+        try {
+            const data = await api.get(
+                `/users/search?search=${encodeURIComponent(userSearch)}&id=${currentUser.users_id}`
+            )
+            setUserSearchResults(data.users || [])
+        } catch (err) {
+            console.error('Failed to search users:', err)
+        } finally {
+            setSearchLoading(false)
+        }
+    }
+
+    const handleClearSearch =()=> {
+        setUserSearch('')
+        setUserSearchResults([])
     }
 
     if (loading) {
@@ -160,41 +240,63 @@ const UserProfile =()=> {
                                             aria-label='No profile image'
                                         >
                                             <span className='text-white fs-3'>
-                                                {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                                                {profile.username?.slice(0, 2).toUpperCase()}
                                             </span>
                                         </div>
                                     )}
                                 </div>
                                 {/* Profile info */}
-                                <div className='col-md-7'>
-                                    <h2 className='mb-1'>
-                                        {profile.first_name} {profile.last_name}
-                                    </h2>
-                                    {profile.email && isOwnProfile && (
-                                        <p className='text-muted mb-1'>
-                                            <small>{profile.email}</small>
-                                        </p>
-                                    )}
-                                    {(profile.city || profile.state || profile.country) && (
-                                        <p className='text-muted mb-0'>
-                                            <small>
-                                                {[profile.city, profile.state, profile.country].filter(Boolean).join(', ')}
-                                            </small>
-                                        </p>
-                                    )}
-                                </div>
-                                {/* Edit button for own profile */}
-                                {isOwnProfile && (
-                                    <div className='col-md-3 text-md-end mt-3 mt-md-0'>
-                                        <Link
-                                            to={`/users/${id}/edit`}
-                                            className='btn btn-outline-secondary btn-sm'
-                                            aria-label='Edit profile'
-                                        >
-                                            Edit Profile
-                                        </Link>
+                                <div className="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h2 className="m-1">{profile.username}</h2>
+                                        {profile.email && isOwnProfile && (
+                                            <p className="text-muted mb-1">
+                                                <small>{profile.email}</small>
+                                            </p>
+                                        )}
+                                        {(profile.city || profile.state || profile.country) && (
+                                            <p className="text-muted mb-0">
+                                                <small>
+                                                    {[profile.city, profile.state, profile.country].filter(Boolean).join(', ')}
+                                                </small>
+                                            </p>
+                                        )}
                                     </div>
-                                )}
+                                    <div className="d-flex gap 2">
+                                        {isOwnProfile && (
+                                            <Link 
+                                                to={`/users/${id}/edit`}
+                                                className="btn btn-outline-secondary btn-sm"
+                                                aria-label='Edit profile'
+                                            >
+                                                Edit Profile
+                                            </Link>
+                                        )}
+                                        {!isOwnProfile && isAuthenticated && (
+                                            <button 
+                                                className={`btn btn-sm ${
+                                                    isFollowing
+                                                        ? 'btn-outline-secondary'
+                                                        : 'btn-primary'
+                                                }`}
+                                                onClick={handleFollow}
+                                                disabled={followLoading}
+                                                aria-busy={followLoading}
+                                                aria-label={isFollowing
+                                                    ? `Unfollow ${profile.username}`
+                                                    : `Follow ${profile.username}`
+                                                }
+                                            >
+                                                {followLoading
+                                                    ? '...'
+                                                    :isFollowing
+                                                        ? 'Unfollow'
+                                                        : 'Follow'
+                                                }
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -249,6 +351,93 @@ const UserProfile =()=> {
                     </div>
                 </section>
 
+                {/* User search - own profile only */}
+                {isOwnProfile && (
+                    <section aria-label='Find users' className="mb-4">
+                        <div className="card p-3">
+                            <h3 className="h6 mb-3">Find Users</h3>
+                            <form onSubmit={handleUserSearch}>
+                                <div className="row g-2 align-items-end">
+                                    <div className="col">
+                                        <input 
+                                            type='text'
+                                            className="form-control form-control-sm"
+                                            placeholder="Search by username..."
+                                            value={userSearch}
+                                            onChange={e => setUserSearch(e.target.value)}
+                                            aria-label="Search users by username"
+                                        />
+                                    </div>
+                                    <div className="col-auto">
+                                        <button 
+                                            type='submit'
+                                            className="btn btn-primary btn-sm"
+                                            disabled={searchLoading}
+                                            aria-busy={searchLoading}
+                                        >
+                                            {searchLoading ? 'Searching...' : 'Search'}
+                                        </button>
+                                    </div>
+                                    {userSearchResults.length > 0 && (
+                                        <div className="col-auto">
+                                            <button 
+                                                type='button'
+                                                className="btn btn-outline-secondary btn-sm"
+                                                onClick={handleClearSearch}
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </form>
+                            {/* Search Results */}
+                            {userSearchResults.length > 0 && (
+                                <div className="mt-3">
+                                    {userSearchResults.map(result => (
+                                        <div 
+                                            key={result.users_id}
+                                            className="d-flex align-items-center justify-content-between py-2 border-bottom"
+                                        >
+                                            <div className="d-flex align-items-center gap-2">
+                                                {result.profile_image_url ? (
+                                                    <img 
+                                                        src={result.profile_image_url}
+                                                        alt={result.username}
+                                                        className="rounded-circle"
+                                                        style={{width: '36px', height: '36px', objectFit: 'cover'}}
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        className='rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0'
+                                                        style={{ width: '36px', height: '36px' }}
+                                                        aria-hidden='true'
+                                                    >
+                                                        <span className='text-white small'>
+                                                            {result.username?.slice(0, 2).toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <Link
+                                                    to={`/users/${result.users_id}`}
+                                                    className='text-decoration-none'
+                                                >
+                                                    {result.username}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {userSearch && userSearchResults.length === 0 && !searchLoading && (
+                                <p className='text-muted mt-3 mb-0'>
+                                    <small>No users found for "{userSearch}"</small>
+                                </p>
+                            )}
+                        </div>
+                    </section>
+                )}
+
                 {/* Tabs */}
                 <section aria-label='Profile content'>
                     {/* Collection tab */}
@@ -267,7 +456,7 @@ const UserProfile =()=> {
                                 ]}
                                 limit={20}
                                 paginated={true}
-                                title={isOwnProfile ? 'My Collection' : `{profile.first_name}'s Collection`}
+                                title={isOwnProfile ? 'My Collection' : `${profile.username}'s Collection`}
                                 showBrowseButton={isOwnProfile}
                                 emptyMessage="No albums in collection yet."
                             />
@@ -277,7 +466,7 @@ const UserProfile =()=> {
                     {/* Followers tab */}
                     {activeTab === 'followers' && (
                         <>
-                            <h3 className='mb-3'>Followers</h3>
+                            <h3 className='mb-3'>{profile.username}'s Followers</h3>
                             {followers.length === 0 ? (
                                 <p className='text-muted'>No followers yet.</p>
                             ) : (
@@ -292,7 +481,7 @@ const UserProfile =()=> {
                                                         aria-hidden='true'
                                                     >
                                                         <span className='text-white'>
-                                                            {follower.first_name?.charAt(0)}{follower.last_name?.charAt(0)}
+                                                            {follower.username?.charAt(0)}
                                                         </span>
                                                     </div>
                                                     <div>
@@ -301,7 +490,7 @@ const UserProfile =()=> {
                                                             className='text-decoration-none'
                                                         >
                                                             <p className='mb-0 fw-500'>
-                                                                {follower.first_name} {follower.last_name}
+                                                                {follower.username}
                                                             </p>
                                                         </Link>
                                                     </div>
@@ -317,7 +506,7 @@ const UserProfile =()=> {
                     {/* Following Tab */}
                     {activeTab === 'following' && (
                         <>
-                            <h3 className='mb-3'>Following</h3>
+                            <h3 className='mb-3'>{profile.username} is Following</h3>
                             {following.length === 0 ? (
                                 <p className='text-muted'>Not following anyone yet.</p>
                             ) : (
@@ -332,7 +521,7 @@ const UserProfile =()=> {
                                                         aria-hidden='true'
                                                     >
                                                         <span className='text-white'>
-                                                            {followed.first_name?.charAt(0)}{followed.last_name?.charAt(0)}
+                                                            {followed.username?.charAt(0)}
                                                         </span>
                                                     </div>
                                                     <div>
@@ -341,7 +530,7 @@ const UserProfile =()=> {
                                                             className='text-decoration-none'
                                                         >
                                                             <p className='mb-0 fw-500'>
-                                                                {followed.first_name} {followed.last_name}
+                                                                {followed.username} 
                                                             </p>
                                                         </Link>
                                                     </div>

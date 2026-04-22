@@ -165,7 +165,7 @@ const LabelDetail =()=> {
                         { value: 'title_asc', label: 'Title A-Z' },
                         { value: 'title_desc', label: 'Title Z-A' }
                     ]}
-                    paginated={false}
+                    paginated={true}
                     title='Discography'
                     emptyMessage='No albums found for this label.'
                 />
