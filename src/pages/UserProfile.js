@@ -4,9 +4,10 @@ import { useAuth } from "../context/AuthContext.js"
 import { api } from "../services/api.js"
 
 import AlbumGrid from "../components/AlbumGrid.js"
-import Pagination from "../components/Pagination.js"
 import StatCard from "../components/StatCard.js"
 import UserCard from "../components/UserCard.js"
+import TopEight from "../components/TopEight.js"
+
 
 /**
  * UserProfile - User profile page
@@ -45,7 +46,8 @@ const UserProfile =()=> {
     const [userSearchResults, setUserSearchResults] = useState([])
     const [searchLoading, setSearchLoading] = useState(false)
 
-    const LIMIT = 20
+    const [topEightCount, setTopEightCount] = useState(0)
+    const [pendingAlbum, setPendingAlbum] = useState(null)
 
     const isOwnProfile = isAuthenticated && currentUser?.users_id === parseInt(id)
 
@@ -195,6 +197,10 @@ const UserProfile =()=> {
     const handleClearSearch =()=> {
         setUserSearch('')
         setUserSearchResults([])
+    }
+
+    const handleAddToTopEight = (album)=> {
+        setPendingAlbum(album)
     }
 
     if (loading) {
@@ -426,6 +432,14 @@ const UserProfile =()=> {
                     {/* Collection tab */}
                     {activeTab === 'collection' && (
                         <>
+                            <TopEight 
+                                userId={id} 
+                                isOwnProfile={isOwnProfile} 
+                                pendingAlbum={pendingAlbum}
+                                onPendingHandled={()=> setPendingAlbum(null)}
+                                onCountChange={setTopEightCount}
+                            />
+
                             <AlbumGrid 
                                 endpoint={`/users/${id}/albums`}
                                 defaultSort='added_desc'
@@ -442,6 +456,9 @@ const UserProfile =()=> {
                                 title={isOwnProfile ? 'My Collection' : `${profile.username}'s Collection`}
                                 showBrowseButton={isOwnProfile}
                                 emptyMessage="No albums in collection yet."
+                                onAddToTopEight={isOwnProfile ? handleAddToTopEight : undefined}
+                                topEightFull={topEightCount >= 8}
+                                scrollToTop={false}
                             />
                         </>
                     )}

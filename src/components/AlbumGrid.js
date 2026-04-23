@@ -31,7 +31,10 @@ const AlbumGrid =({
     emptyMessage = 'No albums found',
     title,
     showBrowseButton = false,
-    limit = 20
+    limit = 20,
+    onAddToTopEight,
+    topEightFull,
+    scrollToTop = true
 }) => {
 
     // specifies if user is authenticated or not. If not, Home page displays on load
@@ -98,8 +101,10 @@ const AlbumGrid =({
     }, [fetchAlbums])
 
     useEffect(()=> {
-        window.scrollTo({ top: 0, behavior: 'smooth'})
-    }, [page])
+        if (scrollToTop) {
+            window.scrollTo({ top: 0, behavior: 'smooth'})
+        }
+    }, [page, scrollToTop])
 
     // handlers 
     const handleSortChange =(e)=> {
@@ -126,7 +131,7 @@ const AlbumGrid =({
 
     // Album cards
     const albumCards = albums.map(album => (
-        <div key={album.album_id} className="col-md-3 col-sm-6 mb-4">
+        <div key={album.album_id} className="col mb-4">
             <div className="card h-100">
 
                 {album.album_image_url ? (
@@ -177,6 +182,17 @@ const AlbumGrid =({
                             {removingId === album.album_id ? '...' : 'x'}
                         </button>
                     )}
+                    {onAddToTopEight && (
+                        <button 
+                            className="btn btn-outline-warning btn-sm"
+                            onClick={()=> onAddToTopEight(album)}
+                            disabled={topEightFull}
+                            aria-label={`Add ${album.title} to Top Eight`}
+                            title={topEightFull ? 'Top Eight is full' : 'Add to Top Eight'}
+                        >
+                            *
+                        </button>
+                    )}
                 </footer>
             </div>
         </div>
@@ -187,7 +203,7 @@ const AlbumGrid =({
         <section aria-label={title || 'Album grid'}>
 
             {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <header className="mb-3">
                 <div className="d-flex align-items-center gap-2">
                     {title && (
                         <h3 className="mb-0">
@@ -229,7 +245,7 @@ const AlbumGrid =({
                         <Link to='/albums' className="btn btn-primary btn-sm">Browse Albums</Link>
                     )}
                 </div>
-            </div>
+            </header>
 
             {error && (
                 <div className="alert alert-danger" role='alert' aria-live='polite'>{error}</div>
@@ -249,19 +265,9 @@ const AlbumGrid =({
                 </div>
             ) : (
                 <>
-                    <div className="row">
+                    <div className="row row-cols-2 row-cols-md-5 g-2">
                         {albumCards}
                     </div>
-
-                    {/* Pagination */}
-                    {paginated && (
-                        <Pagination 
-                            page={page}
-                            totalPages={totalPages}
-                            onPageChange={setPage}
-                            label='Album pagination'
-                        />
-                    )}
                 </>
             )}
         </section>
