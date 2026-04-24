@@ -29,7 +29,14 @@ const AlbumDetail =()=> {
     const [ error, setError ] = useState(null)
     const [ successMessage, setSuccessMessage ] = useState(null)
 
+    const [onWantlist, setOnWantlist] = useState(false)
+    const [wantlistId, setWantlistId] = useState(null)
+    const [wantlistNotes, setWantlistNotes] = useState('')
+    const [wantlistPriority, setWantlistPriority] = useState('medium')
+    const [showWantlistForm, setShowWantlistForm] = useState(false)
+
     // GET DATA
+    // USE EFFECTS
     useEffect(()=> {
 
         const fetchAlbum = async ()=> {
@@ -53,11 +60,15 @@ const AlbumDetail =()=> {
 
                 // Check if album is in user's collection
                 if (isAuthenticated && user) {
-                    // const collectionData = await api.get(`/users/${user.users_id}/albums?page=1&limit=9999`)
-                    // const found = collectionData.albums?.some(a => a.album_id === albumData.album_id)
-                    // setInCollection(found || false)
+
                     const collectionCheck = await api.get(`/users/${user.users_id}/albums/${albumData.album_id}`)
                     setInCollection(collectionCheck.inCollection || false)
+
+                    const wantlistCheck = await api.get(`/users/${user.users_id}/wantlist/check/${id}`)
+                    setOnWantlist(wantlistCheck.onWantlist)
+                    setWantlistId(wantlistCheck.wantlist_id)
+                    setWantlistNotes(wantlistCheck.notes || '')
+                    setWantlistPriority(wantlistCheck.priority || 'medium')
                 }
 
             } catch (err) {
@@ -71,6 +82,8 @@ const AlbumDetail =()=> {
 
     }, [id, isAuthenticated, user])
 
+
+    // HANDLERS 
     const handleAddToCollection = async ()=> {
         if (!isAuthenticated) {
             navigate('/login')
@@ -117,6 +130,33 @@ const AlbumDetail =()=> {
             setError('Failed to remove album. Please try again.')
         } finally {
             setActionLoading(false)
+        }
+    }
+
+    const handleAddToWantlist = async () => {
+        try {
+            const data = await api.post(`/users/${user.users_id}/wantlist`, {
+                album_id: album.album_id,
+                notes: wantlistNotes || null,
+                priority: wantlistPriority
+            })
+            setOnWantlist(true)
+            setWantlistId(data.wantlist_id)
+            setShowWantlistForm(false)
+        } catch (err) {
+            console.error('Failed to add to wantlist:', err)
+        }
+    }
+
+    const handleRemoveFromWantlist = async () => {
+        try {
+            await api.delete(`/users/${user.users_id}/wantlist/${wantlistId}`)
+            setOnWantlist(false)
+            setWantlistId(null)
+            setWantlistNotes('')
+            setWantlistPriority('medium')
+        } catch (err) {
+            console.error('Failed to remove from wantlist:', err)
         }
     }
 
@@ -219,6 +259,78 @@ const AlbumDetail =()=> {
                             >
                                 Edit Album
                             </Link>
+                        </div>
+                    )}
+
+                    {isAuthenticated && (
+                        <div className='mt-3'>
+                            {onWantlist ? (
+                                <button
+                                    className='btn btn-warning btn-sm'
+                                    onClick={handleRemoveFromWantlist}
+                                    aria-label='Remove from wantlist'
+                                >
+                                    ★ On Wantlist — Remove
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        className='btn btn-outline-warning btn-sm'
+                                        onClick={() => setShowWantlistForm(!showWantlistForm)}
+                                        aria-label='Add to wantlist'
+                                    >
+                                        ☆ Add to Wantlist
+                                    </button>
+
+                                    {showWantlistForm && (
+                                        <div className='card mt-2 p-3'>
+                                            <div className='mb-2'>
+                                                <label className='form-label' htmlFor='wantlist-priority'>
+                                                    Priority
+                                                </label>
+                                                <select
+                                                    className='form-select form-select-sm'
+                                                    id='wantlist-priority'
+                                                    value={wantlistPriority}
+                                                    onChange={e => setWantlistPriority(e.target.value)}
+                                                >
+                                                    <option value='high'>High</option>
+                                                    <option value='medium'>Medium</option>
+                                                    <option value='low'>Low</option>
+                                                </select>
+                                            </div>
+                                            <div className='mb-2'>
+                                                <label className='form-label' htmlFor='wantlist-notes'>
+                                                    Notes
+                                                </label>
+                                                <textarea
+                                                    className='form-control form-control-sm'
+                                                    id='wantlist-notes'
+                                                    rows={2}
+                                                    value={wantlistNotes}
+                                                    onChange={e => setWantlistNotes(e.target.value)}
+                                                    placeholder='e.g. Looking for original pressing only...'
+                                                    maxLength={500}
+                                                />
+                                            </div>
+                                            <div className='d-flex gap-2'>
+                                                <button
+                                                    className='btn btn-warning btn-sm'
+                                                    onClick={handleAddToWantlist}
+                                                >
+                                                    Add to Wantlist
+                                                </button>
+                                                <button
+                                                    className='btn btn-outline-secondary btn-sm'
+                                                    onClick={() => setShowWantlistForm(false)}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

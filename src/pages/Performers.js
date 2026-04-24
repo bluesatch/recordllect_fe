@@ -264,7 +264,7 @@ const Performers =()=> {
                     <>
                         <div className='row'>
                             {performers.map(performer => (
-                                <div key={performer.performer_id} className="col-md-4 col-sm-6 mb-4">
+                                <div key={performer.performer_id} className="col-md-3 col-sm-6 mb-4">
                                     <PerformerCard performer={performer} />
                                 </div>
                             ))}

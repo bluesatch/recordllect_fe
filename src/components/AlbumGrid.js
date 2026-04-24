@@ -55,7 +55,9 @@ const AlbumGrid =({
         { value: 'title_asc', label: 'Title A-Z' },
         { value: 'title_desc', label: 'Title Z-A' },
         { value: 'year_desc', label: 'Year - Newest' },
-        { value: 'year_asc', label: 'Year - Oldest' }
+        { value: 'year_asc', label: 'Year - Oldest' },
+        { value: 'performer_asc', label: 'Performer A - Z'},
+        { value: 'performer_desc', label: 'Performer Z - A'}
     ]
 
     // added sort options 
@@ -65,7 +67,7 @@ const AlbumGrid =({
         ...defaultSortOptions
     ]   
 
-    const resolvedSortOptions = sortOptions || defaultSortOptions
+    const resolvedSortOptions = addedSortOptions || defaultSortOptions
 
     // FETCH Albums
     const fetchAlbums = useCallback(async ()=> {

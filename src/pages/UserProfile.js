@@ -7,6 +7,7 @@ import AlbumGrid from "../components/AlbumGrid.js"
 import StatCard from "../components/StatCard.js"
 import UserCard from "../components/UserCard.js"
 import TopEight from "../components/TopEight.js"
+import Wantlist from "../components/Wantlist.js"
 
 
 /**
@@ -313,7 +314,7 @@ const UserProfile =()=> {
                 {/* Stats */}
                 <section aria-label='Profile statistics'>
                     <div className='row mb-4'>
-                        <div className="col-4">
+                        <div className="col-3">
                             <StatCard 
                                 value={profile.album_count || 0}
                                 label='Albums'
@@ -321,7 +322,7 @@ const UserProfile =()=> {
                                 isActive={activeTab === 'collection'}
                             />
                         </div>
-                        <div className="col-4">
+                        <div className="col-3">
                             <StatCard 
                                 value={profile.followers_count || 0}
                                 label='Followers'
@@ -329,12 +330,20 @@ const UserProfile =()=> {
                                 isActive={activeTab === 'followers'}
                             />
                         </div>
-                        <div className="col-4">
+                        <div className="col-3">
                             <StatCard 
                                 value={profile.following_count || 0}
                                 label='Following'
                                 onClick={()=> setActiveTab('following')}
                                 isActive={activeTab === 'following'}
+                            />
+                        </div>
+                        <div className='col-3'>
+                            <StatCard 
+                                value={profile.wantlist_count || 0}
+                                label='Wantlist'
+                                onClick={()=> setActiveTab('wantlist')}
+                                isActive={activeTab === 'wantlist'}
                             />
                         </div>
                     </div>
@@ -496,6 +505,27 @@ const UserProfile =()=> {
                                     ))}
                                 </div>
                             )}
+                        </>
+                    )}
+                    {activeTab === 'wantlist' && (
+                        <>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h3 className="mb-0">
+                                    {isOwnProfile ? 'My Wantlist' : `${profile.username}'s Wantlist`}
+                                </h3>
+                                {isOwnProfile && (
+                                    <a 
+                                        href={`/users/${id}/wantlist`}
+                                        className="btn btn-outline-secondary btn-sm"
+                                    >
+                                        View Full Page
+                                    </a>
+                                )}
+                            </div>
+                            <Wantlist 
+                                userId={id}
+                                isOwnProfile={isOwnProfile}
+                            />
                         </>
                     )}
                 </section>
