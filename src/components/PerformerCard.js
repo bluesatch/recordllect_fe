@@ -31,6 +31,26 @@ const PerformerCard = ({ performer })=> {
     return (
         <div className="card h-100">
             <div className="card-body">
+                <div className="d-flex align-items-center gap-2 mb-2">
+                    {performer.profile_image_url ? (
+                        <img 
+                            src={performer.profile_image_url}
+                            alt={`${performer.performer_name} profile`}
+                            className="rounded-circle flex-shrink-0"
+                            style={{ width: '44px', height: '44px', objectFit: 'cover'}}
+                        />
+                    ) : (
+                        <div
+                            className='rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0'
+                            style={{ width: '44px', height: '44px' }}
+                            aria-hidden='true'
+                        >
+                            <span className='text-white'>
+                                {performer.performer_name?.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
+                    )}
+                </div>
                 <div className="d-flex justify-content-between align-items-start mb-2">
                     <h3 className="card-title h6 mb-0">{performer.performer_name}</h3>
                     <span className={`badge ms-2 ${

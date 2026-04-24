@@ -32,7 +32,9 @@ const EditPerformer = () => {
         band_name: '',
         formed_year: '',
         disbanded_year: '',
-        country: ''
+        country: '',
+        bio: '',
+        profile_image_url: ''
     })
 
     const [formLoading, setFormLoading] = useState(true)
@@ -86,7 +88,9 @@ const EditPerformer = () => {
                         band_name: '',
                         formed_year: '',
                         disbanded_year: '',
-                        country: ''
+                        country: '',
+                        bio: data.bio || '',
+                        profile_image_url: data.profile_image_url || ''
                     })
                 } else {
                     setFormData({
@@ -99,7 +103,9 @@ const EditPerformer = () => {
                         band_name: data.band_name || '',
                         formed_year: data.formed_year || '',
                         disbanded_year: data.disbanded_year || '',
-                        country: data.country || ''
+                        country: data.country || '',
+                        bio: data.bio || '',
+                        profile_image_url: data.profile_image_url || ''
                     })
                 }
             } catch (err) {
@@ -406,7 +412,49 @@ const EditPerformer = () => {
 
                         </div>
                     </div>
+                    {/* Bio and image */}
+                    <section aria-label='Bio and image' className='mt-4'>
+                        <h3 className='h6 text-muted mb-3'>Profile</h3>
 
+                        <div className='mb-3'>
+                            <label className='form-label' htmlFor='profile_image_url'>Profile Image URL</label>
+                            <input 
+                                type='url'
+                                className='form-control'
+                                id='profile_image_url'
+                                name='profile_image_url'
+                                value={formData.profile_image_url}
+                                onChange={handleChange}
+                            />
+                            {formData.profile_image_url && (
+                                <div className='mt-2'>
+                                    <img 
+                                        src={formData.profile_image_url}
+                                        alt='Performer profile preview'
+                                        className='rounded-circle'
+                                        style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                        onError={e => e.target.stye.display = 'none'}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <div className='mb-3'>
+                            <label className='form-label' htmlFor='bio'>Bio</label>
+                            <textarea 
+                                className='form-control'
+                                id='bio'
+                                name='bio'
+                                rows={4}
+                                value={formData.bio}
+                                onChange={handleChange}
+                                placeholder='A brief description...'
+                                maxLength={500}
+                            />
+                            <div className='form-text'>
+                                {formData.bio.length}/500 characters
+                            </div>
+                        </div>
+                    </section>
                     {/* Submit buttons */}
                     <div className='d-flex gap-2 mt-4 mb-5'>
                         <button

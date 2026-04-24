@@ -29,17 +29,11 @@ const UserProfile =()=> {
 
     // STATE
     const [profile, setProfile] = useState(null)
-    // const [collection, setCollection] = useState([])
     const [followers, setFollowers] = useState([])
     const [following, setFollowing] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [activeTab, setActiveTab] = useState('collection')
-
-    // const [page, setPage] = useState(1)
-    // const [totalPages, setTotalPages] = useState(1)
-    // const [total, setTotal] = useState(0)
-    // const [sort, setSort] = useState('added_desc')
 
     const [isFollowing, setIsFollowing] = useState(false)
     const [followLoading, setFollowLoading] = useState(false)
@@ -79,23 +73,6 @@ const UserProfile =()=> {
         fetchProfile()
     }, [id])
 
-    // useEffect(()=> {
-    //     const fetchCollection = async ()=> {
-    //         try {   
-    //             const data = await api.get(`/users/${id}/albums?page=${page}&limit=${LIMIT}&sort=${sort}`)
-    //             setCollection(data.albums || [])
-    //             setTotalPages(data.totalPages || 1)
-    //             setTotal(data.total || 0)
-    //         } catch (err) {
-    //             console.error('Failed to load collection:', err)
-    //         }
-    //     }
-
-    //     if (activeTab === 'collection') {
-    //         fetchCollection()
-    //     }
-    // }, [id, page, activeTab, sort])
-
     useEffect(()=> {
         const fetchFollowers = async ()=> {
             try {
@@ -119,10 +96,6 @@ const UserProfile =()=> {
         if (activeTab === 'following') fetchFollowing()
     }, [id, activeTab])
 
-    // useEffect(()=> {
-    //     window.scrollTo({ top: 0, behavior: 'smooth'})
-    // }, [page])
-
     useEffect(()=> {
         const checkFollowing = async ()=> {
             if (!isAuthenticated || isOwnProfile) return 
@@ -141,12 +114,6 @@ const UserProfile =()=> {
     }, [id, isAuthenticated, isOwnProfile, profile])
 
     // HANDLERS 
-
-    // sort handler
-    // const handleSortChange =(e)=> {
-    //     setSort(e.target.value)
-    //     setPage(1)
-    // }
 
     // follow/unfollow
     const handleFollow = async ()=> {
@@ -255,9 +222,12 @@ const UserProfile =()=> {
                                     )}
                                 </div>
                                 {/* Profile info */}
-                                <div className="d-flex justify-content-between align-items-start">
-                                    <div>
+                                <div className="row">
+                                    <div className="col-md-7 mb-3">
                                         <h2 className="m-1">{profile.username}</h2>
+                                        {profile.bio && (
+                                            <p className='mb-2'>{profile.bio}</p>
+                                        )}
                                         {profile.email && isOwnProfile && (
                                             <p className="text-muted mb-1">
                                                 <small>{profile.email}</small>
@@ -271,7 +241,7 @@ const UserProfile =()=> {
                                             </p>
                                         )}
                                     </div>
-                                    <div className="d-flex gap 2">
+                                    <div className="col-md-5 d-flex justify-content-start justify-content-md-end align-items-start">
                                         {isOwnProfile && (
                                             <Link 
                                                 to={`/users/${id}/edit`}
@@ -514,12 +484,12 @@ const UserProfile =()=> {
                                     {isOwnProfile ? 'My Wantlist' : `${profile.username}'s Wantlist`}
                                 </h3>
                                 {isOwnProfile && (
-                                    <a 
-                                        href={`/users/${id}/wantlist`}
+                                    <Link 
+                                        to={`/users/${id}/wantlist`}
                                         className="btn btn-outline-secondary btn-sm"
                                     >
                                         View Full Page
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
                             <Wantlist 

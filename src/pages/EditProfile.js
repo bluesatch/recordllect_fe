@@ -28,6 +28,7 @@ const EditProfile =()=> {
         username: '',
         first_name: '',
         last_name: '',
+        bio: '',
         address_line_1: '',
         address_line_2: '',
         city: '',
@@ -79,7 +80,8 @@ const EditProfile =()=> {
                     state: data.state || '',
                     postal_code: data.postal_code || '',
                     country: data.country || '',
-                    profile_image_url: data.profile_image_url || ''
+                    profile_image_url: data.profile_image_url || '',
+                    bio: data.bio || ''
                 })
 
             } catch (err) {
@@ -212,6 +214,24 @@ const EditProfile =()=> {
                                             required
                                             aria-required='true'
                                         />
+                                    </div>
+                                </div>
+                                <div className='mb-3'>
+                                    <label className='form-label' htmlFor='bio'>
+                                        Bio
+                                    </label>
+                                    <textarea
+                                        className='form-control'
+                                        id='bio'
+                                        name='bio'
+                                        rows={4}
+                                        value={formData.bio}
+                                        onChange={handleChange}
+                                        placeholder='Tell us a little about yourself...'
+                                        maxLength={500}
+                                    />
+                                    <div className='form-text'>
+                                        {formData.bio.length}/500 characters
                                     </div>
                                 </div>
                             </section>

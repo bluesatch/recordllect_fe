@@ -208,6 +208,27 @@ const PerformerDetail =()=> {
                 <section aria-label='Performer information'>
                     <div className='card mb-4'>
                         <div className="card-body">
+                            {/* Avatar and name row */}
+                            <div className='d-flex align-items-center gap-3 mb-3'>
+                                {performer.profile_image_url ? (
+                                    <img 
+                                        src={performer.profile_image_url}
+                                        alt={`${performerName()} profile`}
+                                        className="rounded-circle flex-shrink-0"
+                                        style={{ width: '80px', height: '80px', objectFit: 'cover'}}
+                                    />
+                                ) : (
+                                    <div 
+                                        className="rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style={{ width: '80px', height: '80px'}}
+                                        aria-hidden='true'
+                                    >
+                                        <span className="text-white fs-4">
+                                            {performerName()?.charAt(0).toUpperCase()}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                             <div className='d-flex justify-content-between align-items-start mb-3'>
                                 <h2 className='mb-0'>
                                     {performerName()}
@@ -228,6 +249,10 @@ const PerformerDetail =()=> {
                                     </Link>
                                 )} 
                             </div>
+                            {/* Bio */}
+                            {performer.bio && (
+                                <p className="text-muted mb-3">{performer.bio}</p>
+                            )}
                             <table className='table table-borderless mb-0'>
                                 <tbody>
                                     {formatYears() && (
