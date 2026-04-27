@@ -8,6 +8,7 @@ import StatCard from "../components/StatCard.js"
 import UserCard from "../components/UserCard.js"
 import TopEight from "../components/TopEight.js"
 import Wantlist from "../components/Wantlist.js"
+import Feed from "../components/Feed.js"
 
 
 /**
@@ -193,27 +194,29 @@ const UserProfile =()=> {
     }
 
     return (
-        <main className="main">
+        <main>
             <div className='container mt-4'>
-                {/* profile header */}
-                <section aria-label='Profile information'>
-                    <div className='card mb-4'>
+
+                {/* Profile header — full width */}
+                <section aria-label='Profile information' className='mb-4'>
+                    <div className='card'>
                         <div className='card-body'>
                             <div className='row align-items-center'>
+
                                 {/* Avatar */}
-                                <div className='col-md-2 text-center mb-3 mb-md-0'>
+                                <div className='col-auto'>
                                     {profile.profile_image_url ? (
-                                        <img 
+                                        <img
                                             src={profile.profile_image_url}
-                                            alt={`${profile.first_name} ${profile.last_name}'s profile`}
-                                            className='rounded-circle img-fluid'
-                                            style={{ width: '100px', height: '100px', objectFit: 'cover'}}
+                                            alt={`@${profile.username}`}
+                                            className='rounded-circle'
+                                            style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                                         />
                                     ) : (
-                                        <div 
-                                            className='rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto'
-                                            style={{ width: '100px', height: '100px'}}
-                                            aria-label='No profile image'
+                                        <div
+                                            className='rounded-circle bg-secondary d-flex align-items-center justify-content-center'
+                                            style={{ width: '80px', height: '80px' }}
+                                            aria-hidden='true'
                                         >
                                             <span className='text-white fs-3'>
                                                 {profile.username?.slice(0, 2).toUpperCase()}
@@ -221,284 +224,302 @@ const UserProfile =()=> {
                                         </div>
                                     )}
                                 </div>
-                                {/* Profile info */}
-                                <div className="row">
-                                    <div className="col-md-7 mb-3">
-                                        <h2 className="m-1">{profile.username}</h2>
-                                        {profile.bio && (
-                                            <p className='mb-2'>{profile.bio}</p>
-                                        )}
-                                        {profile.email && isOwnProfile && (
-                                            <p className="text-muted mb-1">
-                                                <small>{profile.email}</small>
-                                            </p>
-                                        )}
-                                        {(profile.city || profile.state || profile.country) && (
-                                            <p className="text-muted mb-0">
-                                                <small>
-                                                    {[profile.city, profile.state, profile.country].filter(Boolean).join(', ')}
-                                                </small>
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="col-md-5 d-flex justify-content-start justify-content-md-end align-items-start">
-                                        {isOwnProfile && (
-                                            <Link 
-                                                to={`/users/${id}/edit`}
-                                                className="btn btn-outline-secondary btn-sm"
-                                                aria-label='Edit profile'
-                                            >
-                                                Edit Profile
-                                            </Link>
-                                        )}
-                                        {!isOwnProfile && isAuthenticated && (
-                                            <button 
-                                                className={`btn btn-sm ${
-                                                    isFollowing
-                                                        ? 'btn-outline-secondary'
-                                                        : 'btn-primary'
-                                                }`}
-                                                onClick={handleFollow}
-                                                disabled={followLoading}
-                                                aria-busy={followLoading}
-                                                aria-label={isFollowing
-                                                    ? `Unfollow ${profile.username}`
-                                                    : `Follow ${profile.username}`
-                                                }
-                                            >
-                                                {followLoading
-                                                    ? '...'
-                                                    :isFollowing
-                                                        ? 'Unfollow'
-                                                        : 'Follow'
-                                                }
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                {/* Stats */}
-                <section aria-label='Profile statistics'>
-                    <div className='row mb-4'>
-                        <div className="col-3">
-                            <StatCard 
-                                value={profile.album_count || 0}
-                                label='Albums'
-                                onClick={()=> setActiveTab('collection')}
-                                isActive={activeTab === 'collection'}
-                            />
-                        </div>
-                        <div className="col-3">
-                            <StatCard 
-                                value={profile.followers_count || 0}
-                                label='Followers'
-                                onClick={()=> setActiveTab('followers')}
-                                isActive={activeTab === 'followers'}
-                            />
-                        </div>
-                        <div className="col-3">
-                            <StatCard 
-                                value={profile.following_count || 0}
-                                label='Following'
-                                onClick={()=> setActiveTab('following')}
-                                isActive={activeTab === 'following'}
-                            />
-                        </div>
-                        <div className='col-3'>
-                            <StatCard 
-                                value={profile.wantlist_count || 0}
-                                label='Wantlist'
-                                onClick={()=> setActiveTab('wantlist')}
-                                isActive={activeTab === 'wantlist'}
-                            />
-                        </div>
-                    </div>
-                </section>
 
-                {/* User search - own profile only */}
-                {isOwnProfile && (
-                    <section aria-label='Find users' className="mb-4">
-                        <div className="card p-3">
-                            <h3 className="h6 mb-3">Find Users</h3>
-                            <form onSubmit={handleUserSearch}>
-                                <div className="row g-2 align-items-end">
-                                    <div className="col">
-                                        <input 
-                                            type='text'
-                                            className="form-control form-control-sm"
-                                            placeholder="Search by username..."
-                                            value={userSearch}
-                                            onChange={e => setUserSearch(e.target.value)}
-                                            aria-label="Search users by username"
-                                        />
-                                    </div>
-                                    <div className="col-auto">
-                                        <button 
-                                            type='submit'
-                                            className="btn btn-primary btn-sm"
-                                            disabled={searchLoading}
-                                            aria-busy={searchLoading}
-                                        >
-                                            {searchLoading ? 'Searching...' : 'Search'}
-                                        </button>
-                                    </div>
-                                    {userSearchResults.length > 0 && (
-                                        <div className="col-auto">
-                                            <button 
-                                                type='button'
-                                                className="btn btn-outline-secondary btn-sm"
-                                                onClick={handleClearSearch}
-                                            >
-                                                Clear
-                                            </button>
-                                        </div>
+                                {/* Profile info */}
+                                <div className='col'>
+                                    <h2 className='mb-1'>@{profile.username}</h2>
+                                    {profile.bio && (
+                                        <p className='mb-1'>{profile.bio}</p>
+                                    )}
+                                    {profile.email && isOwnProfile && (
+                                        <p className='text-muted mb-1'>
+                                            <small>{profile.email}</small>
+                                        </p>
+                                    )}
+                                    {(profile.city || profile.state || profile.country) && (
+                                        <p className='text-muted mb-0'>
+                                            <small>
+                                                {[profile.city, profile.state, profile.country]
+                                                    .filter(Boolean)
+                                                    .join(', ')}
+                                            </small>
+                                        </p>
                                     )}
                                 </div>
-                            </form>
-                            {/* Search Results */}
-                            {userSearchResults.length > 0 && (
-                                <div className="mt-3">
-                                    {userSearchResults.map(result => (
-                                        <div 
-                                            key={result.users_id}
-                                            className="d-flex align-items-center justify-content-between py-2 border-bottom"
+
+                                {/* Action buttons */}
+                                <div className='col-auto d-flex gap-2'>
+                                    {isOwnProfile && (
+                                        <Link
+                                            to={`/users/${id}/edit`}
+                                            className='btn btn-outline-secondary btn-sm'
                                         >
-                                            <div className="d-flex align-items-center gap-2">
-                                                {result.profile_image_url ? (
-                                                    <img 
-                                                        src={result.profile_image_url}
-                                                        alt={result.username}
-                                                        className="rounded-circle"
-                                                        style={{width: '36px', height: '36px', objectFit: 'cover'}}
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className='rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0'
-                                                        style={{ width: '36px', height: '36px' }}
-                                                        aria-hidden='true'
-                                                    >
-                                                        <span className='text-white small'>
-                                                            {result.username?.slice(0, 2).toUpperCase()}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <Link
-                                                    to={`/users/${result.users_id}`}
-                                                    className='text-decoration-none'
-                                                >
-                                                    {result.username}
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    ))}
+                                            Edit Profile
+                                        </Link>
+                                    )}
+                                    {!isOwnProfile && isAuthenticated && (
+                                        <button
+                                            className={`btn btn-sm ${
+                                                isFollowing
+                                                    ? 'btn-outline-secondary'
+                                                    : 'btn-primary'
+                                            }`}
+                                            onClick={handleFollow}
+                                            disabled={followLoading}
+                                            aria-busy={followLoading}
+                                        >
+                                            {followLoading
+                                                ? '...'
+                                                : isFollowing
+                                                    ? 'Unfollow'
+                                                    : 'Follow'
+                                            }
+                                        </button>
+                                    )}
                                 </div>
-                            )}
-                            {userSearch && userSearchResults.length === 0 && !searchLoading && (
-                                <p className='text-muted mt-3 mb-0'>
-                                    <small>No users found for "{userSearch}"</small>
-                                </p>
-                            )}
-                        </div>
-                    </section>
-                )}
 
-                {/* Tabs */}
-                <section aria-label='Profile content'>
-                    {/* Collection tab */}
-                    {activeTab === 'collection' && (
-                        <>
-                            <TopEight 
-                                userId={id} 
-                                isOwnProfile={isOwnProfile} 
-                                pendingAlbum={pendingAlbum}
-                                onPendingHandled={()=> setPendingAlbum(null)}
-                                onCountChange={setTopEightCount}
-                            />
-
-                            <AlbumGrid 
-                                endpoint={`/users/${id}/albums`}
-                                defaultSort='added_desc'
-                                sortOptions={[
-                                    { value: 'added_desc', label: 'Recently Added' },
-                                    { value: 'added_asc', label: 'Oldest Added' },
-                                    { value: 'title_asc', label: 'Title A-Z' },
-                                    { value: 'title_desc', label: 'Title Z-A' },
-                                    { value: 'year_desc', label: 'Year — Newest' },
-                                    { value: 'year_asc', label: 'Year — Oldest' }
-                                ]}
-                                limit={20}
-                                paginated={true}
-                                title={isOwnProfile ? 'My Collection' : `${profile.username}'s Collection`}
-                                showBrowseButton={isOwnProfile}
-                                emptyMessage="No albums in collection yet."
-                                onAddToTopEight={isOwnProfile ? handleAddToTopEight : undefined}
-                                topEightFull={topEightCount >= 8}
-                                scrollToTop={false}
-                            />
-                        </>
-                    )}
-
-                    {/* Followers tab */}
-                    {activeTab === 'followers' && (
-                        <>
-                            <h3 className='mb-3'>{profile.username}'s Followers</h3>
-                            {followers.length === 0 ? (
-                                <p className='text-muted'>No followers yet.</p>
-                            ) : (
-                                <div className='row'>
-                                    {followers.map(follower => (
-                                        <div key={follower.users_id} className="col-md-4 col-sm-6 mb-3">
-                                            <UserCard user={follower} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {/* Following Tab */}
-                    {activeTab === 'following' && (
-                        <>
-                            <h3 className='mb-3'>{profile.username} is Following</h3>
-                            {following.length === 0 ? (
-                                <p className='text-muted'>Not following anyone yet.</p>
-                            ) : (
-                                <div className='row'>
-                                    {following.map(followed => (
-                                        <div key={followed.users_id} className="col-md-4 col-sm-6 mb-3">
-                                            <UserCard user={followed} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-                    {activeTab === 'wantlist' && (
-                        <>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3 className="mb-0">
-                                    {isOwnProfile ? 'My Wantlist' : `${profile.username}'s Wantlist`}
-                                </h3>
-                                {isOwnProfile && (
-                                    <Link 
-                                        to={`/users/${id}/wantlist`}
-                                        className="btn btn-outline-secondary btn-sm"
-                                    >
-                                        View Full Page
-                                    </Link>
-                                )}
                             </div>
-                            <Wantlist 
-                                userId={id}
-                                isOwnProfile={isOwnProfile}
-                            />
-                        </>
-                    )}
+                        </div>
+                    </div>
                 </section>
+
+                {/* Main layout — aside + content */}
+                <div className='row'>
+
+                    {/* Aside — stats and user search */}
+                    <aside className='col-md-3 mb-4'>
+
+                        {/* Stats */}
+                        <div className='card mb-3'>
+                            <div className='card-body p-2'>
+                                <StatCard
+                                    value={profile.album_count || 0}
+                                    label='Albums'
+                                    onClick={() => setActiveTab('collection')}
+                                    isActive={activeTab === 'collection'}
+                                />
+                                <StatCard
+                                    value={profile.followers_count || 0}
+                                    label='Followers'
+                                    onClick={() => setActiveTab('followers')}
+                                    isActive={activeTab === 'followers'}
+                                />
+                                <StatCard
+                                    value={profile.following_count || 0}
+                                    label='Following'
+                                    onClick={() => setActiveTab('following')}
+                                    isActive={activeTab === 'following'}
+                                />
+                                <StatCard
+                                    value={profile.wantlist_count || 0}
+                                    label='Wantlist'
+                                    onClick={() => setActiveTab('wantlist')}
+                                    isActive={activeTab === 'wantlist'}
+                                />
+                            </div>
+                        </div>
+
+                        {/* User search — own profile only */}
+                        {isOwnProfile && (
+                            <div className='card'>
+                                <div className='card-body'>
+                                    <h3 className='h6 mb-3'>Find Users</h3>
+                                    <form onSubmit={handleUserSearch}>
+                                        <div className='d-flex gap-2 mb-2'>
+                                            <input
+                                                type='text'
+                                                className='form-control form-control-sm'
+                                                placeholder='Search by username...'
+                                                value={userSearch}
+                                                onChange={e => setUserSearch(e.target.value)}
+                                                aria-label='Search users by username'
+                                            />
+                                            <button
+                                                type='submit'
+                                                className='btn btn-primary btn-sm'
+                                                disabled={searchLoading}
+                                                aria-busy={searchLoading}
+                                            >
+                                                {searchLoading ? '...' : 'Go'}
+                                            </button>
+                                        </div>
+                                        {userSearchResults.length > 0 && (
+                                            <button
+                                                type='button'
+                                                className='btn btn-outline-secondary btn-sm w-100 mb-2'
+                                                onClick={handleClearSearch}
+                                            >
+                                                Clear Results
+                                            </button>
+                                        )}
+                                    </form>
+
+                                    {/* Search results */}
+                                    {userSearchResults.length > 0 && (
+                                        <div className='mt-2'>
+                                            {userSearchResults.map(result => (
+                                                <div key={result.users_id} className='mb-2'>
+                                                    <UserCard user={result} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {userSearch && userSearchResults.length === 0 && !searchLoading && (
+                                        <p className='text-muted mb-0'>
+                                            <small>No users found for "{userSearch}"</small>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </aside>
+
+                    {/* Main content area */}
+                    <div className='col-md-9'>
+
+                        {/* Tab buttons */}
+                        <div className='d-flex flex-wrap gap-2 mb-4'>
+                            {[
+                                { key: 'collection', label: 'Collection' },
+                                { key: 'feed', label: 'Feed' },
+                                { key: 'wantlist', label: 'Wantlist' },
+                                { key: 'followers', label: 'Followers' },
+                                { key: 'following', label: 'Following' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.key}
+                                    className={`btn btn-sm ${
+                                        activeTab === tab.key
+                                            ? 'btn-primary'
+                                            : 'btn-outline-secondary'
+                                    }`}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    aria-pressed={activeTab === tab.key}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Tab content */}
+                        <section aria-label='Profile content'>
+
+                            {/* Collection tab */}
+                            {activeTab === 'collection' && (
+                                <>
+                                    <TopEight
+                                        userId={id}
+                                        isOwnProfile={isOwnProfile}
+                                        pendingAlbum={pendingAlbum}
+                                        onPendingHandled={() => setPendingAlbum(null)}
+                                        onCountChange={setTopEightCount}
+                                    />
+                                    <AlbumGrid
+                                        endpoint={`/users/${id}/albums`}
+                                        defaultSort='added_desc'
+                                        sortOptions={[
+                                            { value: 'added_desc', label: 'Recently Added' },
+                                            { value: 'added_asc', label: 'Oldest Added' },
+                                            { value: 'title_asc', label: 'Title A-Z' },
+                                            { value: 'title_desc', label: 'Title Z-A' },
+                                            { value: 'year_desc', label: 'Year — Newest' },
+                                            { value: 'year_asc', label: 'Year — Oldest' }
+                                        ]}
+                                        limit={20}
+                                        paginated={true}
+                                        title={isOwnProfile ? 'My Collection' : `@${profile.username}'s Collection`}
+                                        showBrowseButton={isOwnProfile}
+                                        emptyMessage='No albums in collection yet.'
+                                        onAddToTopEight={isOwnProfile ? handleAddToTopEight : undefined}
+                                        topEightFull={topEightCount >= 8}
+                                        scrollToTop={false}
+                                    />
+                                </>
+                            )}
+
+                            {/* Feed tab — placeholder for now */}
+                            {activeTab === 'feed' && (
+                                <Feed 
+                                    endpoint={`/users/${id}/posts`}
+                                    showForm={isOwnProfile}
+                                    emptyMessage={
+                                        isOwnProfile
+                                            ? "You haven't posted anything yet."
+                                            : `@${profile.username} hasn't posted anything yet.`
+                                    }
+                                />
+                            )}
+
+                            {/* Wantlist tab */}
+                            {activeTab === 'wantlist' && (
+                                <>
+                                    <div className='d-flex justify-content-between align-items-center mb-3'>
+                                        <h3 className='mb-0'>
+                                            {isOwnProfile
+                                                ? 'My Wantlist'
+                                                : `@${profile.username}'s Wantlist`
+                                            }
+                                        </h3>
+                                        {isOwnProfile && (
+                                            <Link
+                                                to={`/users/${id}/wantlist`}
+                                                className='btn btn-outline-secondary btn-sm'
+                                            >
+                                                View Full Page
+                                            </Link>
+                                        )}
+                                    </div>
+                                    <Wantlist
+                                        userId={id}
+                                        isOwnProfile={isOwnProfile}
+                                    />
+                                </>
+                            )}
+
+                            {/* Followers tab */}
+                            {activeTab === 'followers' && (
+                                <>
+                                    <h3 className='mb-3'>
+                                        @{profile.username}'s Followers
+                                    </h3>
+                                    {followers.length === 0 ? (
+                                        <p className='text-muted'>No followers yet.</p>
+                                    ) : (
+                                        <div className='row'>
+                                            {followers.map(follower => (
+                                                <div key={follower.users_id} className='col-md-6 mb-3'>
+                                                    <UserCard user={follower} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {/* Following tab */}
+                            {activeTab === 'following' && (
+                                <>
+                                    <h3 className='mb-3'>
+                                        @{profile.username} is Following
+                                    </h3>
+                                    {following.length === 0 ? (
+                                        <p className='text-muted'>Not following anyone yet.</p>
+                                    ) : (
+                                        <div className='row'>
+                                            {following.map(followed => (
+                                                <div key={followed.users_id} className='col-md-6 mb-3'>
+                                                    <UserCard user={followed} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                        </section>
+                    </div>
+                </div>
             </div>
         </main>
     )

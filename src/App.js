@@ -15,6 +15,7 @@ import EditProfile from './pages/EditProfile.js'
 import PerformerDetail from './pages/PerformerDetail.js'
 import EditPerformer from './pages/EditPerformer.js'
 import WantlistPage from './pages/WantlistPage.js'
+import FeedPage from './pages/FeedPage.js'
 
 const App =()=> {
     return (
@@ -35,6 +36,7 @@ const App =()=> {
                 <Route path='/users/:id' element={<UserProfile />} />
                 <Route path='/users/:id/edit' element={<EditProfile />}/>
                 <Route path='/users/:id/wantlist' element={<WantlistPage />} />
+                <Route path ='/feed' element={<FeedPage />} />
                 <Route path="*" element={ <NotFound /> } />
             </Routes>
         </>

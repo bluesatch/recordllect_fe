@@ -210,6 +210,7 @@ const PerformerDetail =()=> {
                         <div className="card-body">
                             {/* Avatar and name row */}
                             <div className='d-flex align-items-center gap-3 mb-3'>
+                                {/* Avatar */}
                                 {performer.profile_image_url ? (
                                     <img 
                                         src={performer.profile_image_url}
@@ -228,30 +229,32 @@ const PerformerDetail =()=> {
                                         </span>
                                     </div>
                                 )}
-                            </div>
-                            <div className='d-flex justify-content-between align-items-start mb-3'>
-                                <h2 className='mb-0'>
-                                    {performerName()}
-                                </h2>
-                                <span className={`badge ms-2 ${ 
-                                    performer.performer_type === 'band'
-                                    ? 'bg-primary'
-                                    : 'bg-secondary'
-                                }`}>
-                                    {performer.performer_type}
-                                </span>
-                                {user?.is_admin && (
-                                    <Link 
-                                        to={`/performers/${id}/edit`}
-                                        className='btn btn-outline-danger btn-sm'
-                                    >
-                                        Edit Performer
-                                    </Link>
-                                )} 
+                                <div className='d-flex justify-content-between align-items-start w-100'>
+                                    <h2 className='mb-0'>
+                                        {performerName()}
+                                    </h2>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className={`badge ms-2 ${ 
+                                            performer.performer_type === 'band'
+                                            ? 'bg-primary'
+                                            : 'bg-secondary'
+                                        }`}>
+                                            {performer.performer_type}
+                                        </span>
+                                        {user?.is_admin && (
+                                            <Link 
+                                                to={`/performers/${id}/edit`}
+                                                className='btn btn-outline-danger btn-sm'
+                                            >
+                                                Edit Performer
+                                            </Link>
+                                        )} 
+                                    </div>
+                                </div>
                             </div>
                             {/* Bio */}
                             {performer.bio && (
-                                <p className="text-muted mb-3">{performer.bio}</p>
+                                <p className="text-muted mb-3 w-75">{performer.bio}</p>
                             )}
                             <table className='table table-borderless mb-0'>
                                 <tbody>
