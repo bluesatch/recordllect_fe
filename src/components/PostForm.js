@@ -86,8 +86,6 @@ const PostForm = ({ onPostCreated, editPost, onEditCancel, onPostUpdated })=> {
             return 
         }
 
-        console.log('Sending normalized tag:', normalizedTag)
-
         try {
             
             const data = await api.post('/tags', { tag_name: normalizedTag })

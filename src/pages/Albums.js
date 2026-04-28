@@ -123,6 +123,7 @@ const Albums =()=> {
     }
 
     const handleAddToCollection = async (albumId)=> {
+
         if (!isAuthenticated) return 
 
         try {

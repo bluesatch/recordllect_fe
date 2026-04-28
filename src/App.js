@@ -16,6 +16,7 @@ import PerformerDetail from './pages/PerformerDetail.js'
 import EditPerformer from './pages/EditPerformer.js'
 import WantlistPage from './pages/WantlistPage.js'
 import FeedPage from './pages/FeedPage.js'
+import DiscoverPage from './pages/DiscoverPage.js'
 
 const App =()=> {
     return (
@@ -37,6 +38,7 @@ const App =()=> {
                 <Route path='/users/:id/edit' element={<EditProfile />}/>
                 <Route path='/users/:id/wantlist' element={<WantlistPage />} />
                 <Route path ='/feed' element={<FeedPage />} />
+                <Route path='/discover' element={<DiscoverPage />} />
                 <Route path="*" element={ <NotFound /> } />
             </Routes>
         </>

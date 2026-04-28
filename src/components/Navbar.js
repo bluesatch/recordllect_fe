@@ -72,11 +72,13 @@ const Navbar =()=> {
                                         Feed
                                     </Link>
                                 </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to='/discover'>
-                                        Discover
-                                    </Link>
-                                </li>
+                                {isAuthenticated && (
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to='/discover'>
+                                            Discover
+                                        </Link>
+                                    </li>
+                                )}
                                 <li className='nav-item'>
                                     <Link   
                                         className='nav-link'

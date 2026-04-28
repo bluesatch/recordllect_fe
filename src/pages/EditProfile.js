@@ -35,13 +35,15 @@ const EditProfile =()=> {
         state: '',
         postal_code: '',
         country: '',
-        profile_image_url: ''
+        profile_image_url: '',
+        genre_ids: []
     })
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState(null)
     const [successMessage, setSuccessMessage] = useState(null)
+    const [allGenres, setAllGenres] = useState([])
 
     // Redirect if not authenticated or trying to edit another user's profile
     useEffect(()=> {
@@ -81,7 +83,8 @@ const EditProfile =()=> {
                     postal_code: data.postal_code || '',
                     country: data.country || '',
                     profile_image_url: data.profile_image_url || '',
-                    bio: data.bio || ''
+                    bio: data.bio || '',
+                    genre_ids: data.genres?.map(g => g.genre_id) || []
                 })
 
             } catch (err) {
@@ -95,6 +98,19 @@ const EditProfile =()=> {
             fetchProfile()
         }
     }, [id, isAuthenticated])
+
+    useEffect(()=> {
+        const fetchGenres = async ()=> {
+            try {
+                const data = await api.get('/genres')
+                setAllGenres(data.genres || [])
+            } catch (err) {
+                console.error('Failed to load genres:', err)
+            }
+        }
+
+        fetchGenres()
+    }, [])
 
     const handleChange =(e)=> {
         setFormData({ ...formData, [e.target.name]: e.target.value})
@@ -120,6 +136,15 @@ const EditProfile =()=> {
         } finally {
             setSaving(false)
         }
+    }
+
+    const handleGenreToggle = (genreId) => {
+        setFormData(prev => ({
+            ...prev,
+            genre_ids: prev.genre_ids.includes(genreId)
+                ? prev.genre_ids.filter(id => id !== genreId)
+                : [...prev.genre_ids, genreId]
+        }))
     }
 
     if (loading) {
@@ -167,6 +192,7 @@ const EditProfile =()=> {
                     <div className='row'>
                         {/* Left col */}
                         <div className='col-md-8'>
+                            {/* Personal info */}
                             <section aria-label="Personal information">
                                 <h3 className='h6 text-muted mb-3'>Personal Info</h3>
 
@@ -234,6 +260,39 @@ const EditProfile =()=> {
                                         {formData.bio.length}/500 characters
                                     </div>
                                 </div>
+                            </section>
+
+                            {/* Genre interests */}
+                            <section aria-label='Genre interests' className="mt-3">
+                                <h3 className="h6 text-muted mb-3">Genre Interests</h3>
+                                <p className="text-muted mb-2">
+                                    <small>Select genres you're interested in - helps others discover you</small>
+                                </p>
+                                <div className="d-flex flex-wrap gap-2" role='group' aria-label='Genre tags'>
+                                    {allGenres.map(genre => {
+                                        const isSelected = formData.genre_ids.includes(genre.genre_id)
+
+                                        return (
+                                            <button 
+                                                key={genre.genre_id}
+                                                type='button'
+                                                className={`btn btn-sm ${
+                                                    isSelected ? 'btn-primary' : 'btn-outline-secondary'
+                                                }`}
+                                                onClick={()=> handleGenreToggle(genre.genre_id)}
+                                                aria-pressed={isSelected}
+                                                aria-label={`${isSelected ? 'Remove' : 'Add'} ${genre.genre_name}`}
+                                            >
+                                                {genre.genre_name}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                                {formData.genre_ids.length > 0 && (
+                                    <p className="text-muted mt-2 mb-0">
+                                        <small>{formData.genre_ids.length} genre{formData.genre_ids.length !== 1 ? 's' : ''} selected</small>
+                                    </p>
+                                )}
                             </section>
 
                             <section aria-label='Address information' className='mt-3'>
