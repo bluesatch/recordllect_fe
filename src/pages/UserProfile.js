@@ -204,7 +204,7 @@ const UserProfile =()=> {
                             <div className='row align-items-center'>
 
                                 {/* Avatar */}
-                                <div className='col-auto'>
+                                <div className='col-sm-auto'>
                                     {profile.profile_image_url ? (
                                         <img
                                             src={profile.profile_image_url}
@@ -292,30 +292,40 @@ const UserProfile =()=> {
                         {/* Stats */}
                         <div className='card mb-3'>
                             <div className='card-body p-2'>
-                                <StatCard
-                                    value={profile.album_count || 0}
-                                    label='Albums'
-                                    onClick={() => setActiveTab('collection')}
-                                    isActive={activeTab === 'collection'}
-                                />
-                                <StatCard
-                                    value={profile.followers_count || 0}
-                                    label='Followers'
-                                    onClick={() => setActiveTab('followers')}
-                                    isActive={activeTab === 'followers'}
-                                />
-                                <StatCard
-                                    value={profile.following_count || 0}
-                                    label='Following'
-                                    onClick={() => setActiveTab('following')}
-                                    isActive={activeTab === 'following'}
-                                />
-                                <StatCard
-                                    value={profile.wantlist_count || 0}
-                                    label='Wantlist'
-                                    onClick={() => setActiveTab('wantlist')}
-                                    isActive={activeTab === 'wantlist'}
-                                />
+                                <div className="row">
+                                    <div className="col-6 mb-2">
+                                        <StatCard
+                                            value={profile.album_count || 0}
+                                            label='Albums'
+                                            onClick={() => setActiveTab('collection')}
+                                            isActive={activeTab === 'collection'}
+                                        />
+                                    </div>
+                                    <div className="col-6 mb-2">
+                                        <StatCard
+                                            value={profile.followers_count || 0}
+                                            label='Followers'
+                                            onClick={() => setActiveTab('followers')}
+                                            isActive={activeTab === 'followers'}
+                                        />
+                                    </div>
+                                    <div className="col-6 mb-2">
+                                        <StatCard
+                                            value={profile.following_count || 0}
+                                            label='Following'
+                                            onClick={() => setActiveTab('following')}
+                                            isActive={activeTab === 'following'}
+                                        />
+                                    </div>
+                                    <div className="col-6 mb-2">
+                                        <StatCard
+                                            value={profile.wantlist_count || 0}
+                                            label='Wantlist'
+                                            onClick={() => setActiveTab('wantlist')}
+                                            isActive={activeTab === 'wantlist'}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

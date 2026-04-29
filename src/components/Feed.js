@@ -54,54 +54,61 @@ const Feed = ({ endpoint, showForm = false, emptyMessage = 'No posts yet.' }) =>
 
     return (
         <section aria-label='Feed'>
+            <div className='row'>
+                <div className='col-md-5'>
+                    {/* Post form */}
+                    {showForm && (
+                        <PostForm onPostCreated={fetchPosts} />
+                    )}
 
-            {/* Post form */}
-            {showForm && (
-                <PostForm onPostCreated={fetchPosts} />
-            )}
-
-            {error && (
-                <div className='alert alert-danger' role='alert' aria-live='polite'>
-                    {error}
+                    {error && (
+                        <div className='alert alert-danger' role='alert' aria-live='polite'>
+                            {error}
+                        </div>
+                    )}
                 </div>
-            )}
+                <div className='col-md-7'>
+                    {/* Results count */}
+                    {!loading && total > 0 && (
+                        <p className='text-muted mb-3'>
+                            <small>
+                                {total} post{total !== 1 ? 's' : ''}
+                            </small>
+                        </p>
+                    )}
 
-            {/* Results count */}
-            {!loading && total > 0 && (
-                <p className='text-muted mb-3'>
-                    <small>
-                        {total} post{total !== 1 ? 's' : ''}
-                    </small>
-                </p>
-            )}
-
-            {/* Posts */}
-            {loading ? (
-                <div className='text-center mt-4'>
-                    <p>Loading posts...</p>
+                    {/* Posts */}
+                    {loading ? (
+                        <div className='text-center mt-4'>
+                            <p>Loading posts...</p>
+                        </div>
+                    ) : posts.length === 0 ? (
+                        <div className='text-center mt-4'>
+                            <p className='text-muted'>{emptyMessage}</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div style={{ maxHeight: '600px', overflow: 'auto', paddingRight: '4px'}}>
+                                {posts.map(post => (
+                                    <PostCard
+                                        key={post.post_id}
+                                        post={post}
+                                        onPostUpdated={fetchPosts}
+                                    />
+                                ))}
+                            <Pagination
+                                page={page}
+                                totalPages={totalPages}
+                                onPageChange={setPage}
+                                label='Feed pagination'
+                            />
+                            </div>
+                        </>
+                    )}
                 </div>
-            ) : posts.length === 0 ? (
-                <div className='text-center mt-4'>
-                    <p className='text-muted'>{emptyMessage}</p>
-                </div>
-            ) : (
-                <>
-                    {posts.map(post => (
-                        <PostCard
-                            key={post.post_id}
-                            post={post}
-                            onPostUpdated={fetchPosts}
-                        />
-                    ))}
+            </div>
 
-                    <Pagination
-                        page={page}
-                        totalPages={totalPages}
-                        onPageChange={setPage}
-                        label='Feed pagination'
-                    />
-                </>
-            )}
+
 
         </section>
     )

@@ -38,7 +38,7 @@ const FeedPage = () => {
                 <div className='row'>
 
                     {/* Main feed */}
-                    <div className='col-md-8'>
+                    <div className='col-md-10'>
                         <h2 className='mb-4'>Feed</h2>
                         <Feed
                             endpoint='/posts/feed'
@@ -48,7 +48,7 @@ const FeedPage = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <aside className='col-md-4'>
+                    <aside className='col-md-2'>
                         <div className='card mb-3'>
                             <div className='card-body'>
                                 <h3 className='h6 mb-2'>Your Feed</h3>

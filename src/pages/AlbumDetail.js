@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.js'
 import { api } from '../services/api.js'
 
+import ReviewSection from '../components/ReviewSection.js'
+
 /**
  * 
  * AlbumDetail - Single album view
@@ -486,6 +488,7 @@ const AlbumDetail =()=> {
                     )}
                 </div>
             </div>
+            <ReviewSection albumId={id} />
         </div>
     )
 }
