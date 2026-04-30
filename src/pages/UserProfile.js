@@ -47,6 +47,11 @@ const UserProfile =()=> {
 
     const [nowPlaying, setNowPlaying] = useState(null)
 
+    const [blockedByMe, setBlockedByMe] = useState(false)
+    const [blockedByThem, setBlockedByThem] = useState(false)
+    const [blockLoading, setBlockLoading] = useState(false)
+    const [blockedUsers, setBlockedUsers] = useState([])
+
     const isOwnProfile = isAuthenticated && currentUser?.users_id === parseInt(id)
 
     // useEffects 
@@ -59,6 +64,11 @@ const UserProfile =()=> {
             try {
                 const profileData = await api.get(`/users/${id}`)
 
+                if (profileData.blocked) {
+                    setError('This profile is not available.')
+                    return 
+                }
+
                 if (profileData.message) {
                     setError(profileData.message)
                     return
@@ -66,6 +76,18 @@ const UserProfile =()=> {
 
                 setProfile(profileData)
                 setNowPlaying(profileData.now_playing || null)
+
+                // Check block status 
+                if (isAuthenticated && !isOwnProfile) {
+                    const blockData = await api.get(`/users/${id}/block/check`)
+                    setBlockedByMe(blockData.blocked_by_me)
+                    setBlockedByThem(blockData.blocked_by_them)
+                }
+
+                if (isOwnProfile) {
+                    const blockedData = await api.get('/users/blocked')
+                    setBlockedUsers(blockedData.blocked_users || [])
+                }
 
             } catch (err) {
                 setError('Failed to load profile. Please try again.')
@@ -156,8 +178,9 @@ const UserProfile =()=> {
 
         try {
             const data = await api.get(
-                `/users/search?search=${encodeURIComponent(userSearch)}&id=${currentUser.users_id}`
+                `/users/search?search=${encodeURIComponent(userSearch)}&context=profile`
             )
+            console.log(data)
             setUserSearchResults(data.users || [])
         } catch (err) {
             console.error('Failed to search users:', err)
@@ -196,6 +219,30 @@ const UserProfile =()=> {
             setNowPlaying(null)
         } catch (err) {
             console.error('Failed to clear now playing:', err)
+        }
+    }
+
+    const handleBlock = async ()=> {
+        setBlockLoading(true)
+
+        try {
+            
+            if (blockedByMe) {
+                await api.delete(`/users/${id}/block`)
+                setBlockedByMe(false)
+            } else {
+                await api.post(`/users/${id}/block`)
+                setBlockedByMe(true)
+                setIsFollowing(false)
+                setProfile(prev => ({
+                    ...prev, 
+                    followers_count: prev.followers_count - (isFollowing ? 1 : 0)
+                }))
+            }
+        } catch (err) {
+            console.error('Failed to block/unblock:', err)
+        } finally {
+            setBlockLoading(false)
         }
     }
 
@@ -310,23 +357,49 @@ const UserProfile =()=> {
                                         </Link>
                                     )}
                                     {!isOwnProfile && isAuthenticated && (
-                                        <button
-                                            className={`btn btn-sm ${
-                                                isFollowing
-                                                    ? 'btn-outline-secondary'
-                                                    : 'btn-primary'
-                                            }`}
-                                            onClick={handleFollow}
-                                            disabled={followLoading}
-                                            aria-busy={followLoading}
-                                        >
-                                            {followLoading
-                                                ? '...'
-                                                : isFollowing
-                                                    ? 'Unfollow'
-                                                    : 'Follow'
-                                            }
-                                        </button>
+                                        <>
+                                            {!blockedByThem && (
+                                                <button
+                                                    className={`btn btn-sm ${
+                                                        isFollowing
+                                                            ? 'btn-outline-secondary'
+                                                            : 'btn-primary'
+                                                    }`}
+                                                    onClick={handleFollow}
+                                                    disabled={followLoading}
+                                                    aria-busy={followLoading}
+                                                >
+                                                    {followLoading
+                                                        ? '...'
+                                                        : isFollowing
+                                                            ? 'Unfollow'
+                                                            : 'Follow'
+                                                    }
+                                                </button>
+                                            )}
+                                            <button 
+                                                className={`btn btn-sm ${
+                                                    blockedByMe 
+                                                        ? 'btn-danger'
+                                                        : 'btn-outline-danger'
+                                                }`}
+                                                onClick={handleBlock}
+                                                disabled={blockLoading}
+                                                aria-busy={blockLoading}
+                                                aria-label={blockedByMe
+                                                    ? `Unblock @${profile.username}`
+                                                    : `Block @${profile.username}`
+                                                }
+                                            >
+                                                {blockLoading
+                                                    ? '...'
+                                                    : blockedByMe
+                                                        ? 'Unblock'
+                                                        : 'Block'
+                                                }
+                                            </button>
+
+                                        </>
                                     )}
                                 </div>
 
@@ -421,7 +494,7 @@ const UserProfile =()=> {
                                         <div className='mt-2'>
                                             {userSearchResults.map(result => (
                                                 <div key={result.users_id} className='mb-2'>
-                                                    <UserCard user={result} />
+                                                    <UserCard user={result} compact={true} />
                                                 </div>
                                             ))}
                                         </div>
@@ -432,6 +505,63 @@ const UserProfile =()=> {
                                             <small>No users found for "{userSearch}"</small>
                                         </p>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Blocked users — own profile only */}
+                        {isOwnProfile && blockedUsers.length > 0 && (
+                            <div className='card mt-3'>
+                                <div className='card-body'>
+                                    <h3 className='h6 mb-3'>
+                                        Blocked Users
+                                        <span className='text-muted ms-2'>
+                                            ({blockedUsers.length})
+                                        </span>
+                                    </h3>
+                                    {blockedUsers.map(blocked => (
+                                        <div
+                                            key={blocked.users_id}
+                                            className='d-flex align-items-center justify-content-between mb-2'
+                                        >
+                                            <div className='d-flex align-items-center gap-2'>
+                                                {blocked.profile_image_url ? (
+                                                    <img
+                                                        src={blocked.profile_image_url}
+                                                        alt={`@${blocked.username}`}
+                                                        className='rounded-circle'
+                                                        style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        className='rounded-circle bg-secondary d-flex align-items-center justify-content-center'
+                                                        style={{ width: '32px', height: '32px' }}
+                                                        aria-hidden='true'
+                                                    >
+                                                        <span className='text-white' style={{ fontSize: '0.7rem' }}>
+                                                            {blocked.username?.slice(0, 2).toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <span style={{ fontSize: '0.85rem' }}>
+                                                    @{blocked.username}
+                                                </span>
+                                            </div>
+                                            <button
+                                                className='btn btn-outline-secondary btn-sm'
+                                                onClick={async () => {
+                                                    await api.delete(`/users/${blocked.users_id}/block`)
+                                                    setBlockedUsers(prev =>
+                                                        prev.filter(u => u.users_id !== blocked.users_id)
+                                                    )
+                                                }}
+                                                style={{ fontSize: '0.75rem' }}
+                                                aria-label={`Unblock @${blocked.username}`}
+                                            >
+                                                Unblock
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

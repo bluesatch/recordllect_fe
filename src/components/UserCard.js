@@ -12,7 +12,13 @@ import { api } from "../services/api.js"
  * - onFollowChange: callback when follow state changes
  */
 
-const UserCard = ({ user, showFollowButton = false, isFollowing: initialFollowing = false, onFollowChange })=> {
+const UserCard = ({ 
+    user, 
+    showFollowButton = false, 
+    isFollowing: initialFollowing = false, 
+    onFollowChange,
+    compact = false 
+})=> {
 
     const { user: currentUser, isAuthenticated } = useAuth()
 
@@ -84,28 +90,29 @@ const UserCard = ({ user, showFollowButton = false, isFollowing: initialFollowin
                         </p>
                     )}
 
-                    {(user.city || user.state || user.country) && (
+                    {!compact && (user.city || user.state || user.country) && (
                         <p className="text-muted mb-0">
                             <small>
                                 {[user.city, user.state, user.country].filter(Boolean).join(', ')}
                             </small>
                         </p>
                     )}
-                    {user.bio && (
+                    {!compact && user.bio && (
                         <p className='text-muted mb-0'>
                             <small>{user.bio}</small>
                         </p>
                     )}
+                    {!compact && user.genres && (
+                        <p className="text-muted mb-0">
+                            <small>🎵 {user.genres}</small>
+                        </p>
+                    )}
+
                     { user.now_playing && (
                         <p className="text-muted mb-0">
                             <small>
                                 🎵 <strong>Now Playing:</strong> {user.now_playing.title} - {user.now_playing.performer_name}
                             </small>
-                        </p>
-                    )}
-                    {user.genres && (
-                        <p className="text-muted mb-0">
-                            <small>🎵 {user.genres}</small>
                         </p>
                     )}
                 </div>
