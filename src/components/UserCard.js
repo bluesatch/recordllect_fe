@@ -96,6 +96,13 @@ const UserCard = ({ user, showFollowButton = false, isFollowing: initialFollowin
                             <small>{user.bio}</small>
                         </p>
                     )}
+                    { user.now_playing && (
+                        <p className="text-muted mb-0">
+                            <small>
+                                🎵 <strong>Now Playing:</strong> {user.now_playing.title} - {user.now_playing.performer_name}
+                            </small>
+                        </p>
+                    )}
                     {user.genres && (
                         <p className="text-muted mb-0">
                             <small>🎵 {user.genres}</small>

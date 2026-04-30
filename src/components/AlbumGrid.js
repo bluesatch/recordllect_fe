@@ -34,7 +34,8 @@ const AlbumGrid =({
     limit = 20,
     onAddToTopEight,
     topEightFull,
-    scrollToTop = true
+    scrollToTop = true,
+    onSetNowPlaying
 }) => {
 
     // specifies if user is authenticated or not. If not, Home page displays on load
@@ -193,6 +194,16 @@ const AlbumGrid =({
                             title={topEightFull ? 'Top Eight is full' : 'Add to Top Eight'}
                         >
                             *
+                        </button>
+                    )}
+                    {onSetNowPlaying && (
+                        <button 
+                            className="btn btn-outline-success btn-sm"
+                            onClick={()=> onSetNowPlaying(album)}
+                            aria-label={`Set ${album.title} as now playing`}
+                            title='Set as Now Playing'
+                        >
+                            &#9654;
                         </button>
                     )}
                 </footer>

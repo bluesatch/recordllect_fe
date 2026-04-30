@@ -45,6 +45,8 @@ const UserProfile =()=> {
     const [topEightCount, setTopEightCount] = useState(0)
     const [pendingAlbum, setPendingAlbum] = useState(null)
 
+    const [nowPlaying, setNowPlaying] = useState(null)
+
     const isOwnProfile = isAuthenticated && currentUser?.users_id === parseInt(id)
 
     // useEffects 
@@ -63,6 +65,7 @@ const UserProfile =()=> {
                 }
 
                 setProfile(profileData)
+                setNowPlaying(profileData.now_playing || null)
 
             } catch (err) {
                 setError('Failed to load profile. Please try again.')
@@ -172,6 +175,30 @@ const UserProfile =()=> {
         setPendingAlbum(album)
     }
 
+    const handleSetNowPlaying = async (album)=> {
+        try {
+            await api.put(`/users/${id}/now-playing`, {
+                album_id: album.album_id
+            })
+            setNowPlaying({
+                album_id: album.album_id,
+                title: album.title,
+                performer_name: album.performer_name
+            })
+        } catch (err) {
+            console.error('Failed to set now playing', err)
+        }
+    }
+
+    const handleClearNowPlaying = async ()=> {
+        try {
+            await api.delete(`/users/${id}/now-playing`)
+            setNowPlaying(null)
+        } catch (err) {
+            console.error('Failed to clear now playing:', err)
+        }
+    }
+
     if (loading) {
         return (
             <div className='container mt-5 text-center'>
@@ -244,6 +271,31 @@ const UserProfile =()=> {
                                                     .join(', ')}
                                             </small>
                                         </p>
+                                    )}
+
+                                    {/* Now Playing */}
+                                    {nowPlaying && (
+                                        <div className="d-flex align-items-center gap-2 mt-2">
+                                            <span style={{ fontSize: '1rem'}}>🎵</span>
+                                            <div>
+                                                <p className="mb-0" style={{ fontSize: '0.85rem' }}>
+                                                    <strong>Now Playing</strong> {nowPlaying.title}
+                                                </p>
+                                                <p className="text-muted mb-0" style={{ fontSize: '0.8rem' }}>
+                                                    {nowPlaying.performer_name}
+                                                </p>
+                                            </div>
+                                            {isOwnProfile && (
+                                                <button 
+                                                    className="btn btn-link btn-sm p-0 text-muted text-decoration-none ms-2"
+                                                    onClick={handleClearNowPlaying}
+                                                    aria-label='Clear now playing'
+                                                    style={{ fontSize: '0.75rem'}}
+                                                >
+                                                    x
+                                                </button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
 
@@ -444,6 +496,7 @@ const UserProfile =()=> {
                                         onAddToTopEight={isOwnProfile ? handleAddToTopEight : undefined}
                                         topEightFull={topEightCount >= 8}
                                         scrollToTop={false}
+                                        onSetNowPlaying={isOwnProfile ? handleSetNowPlaying : undefined}
                                     />
                                 </>
                             )}
