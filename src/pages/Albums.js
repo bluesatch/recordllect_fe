@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { Link } from 'react-router-dom'
+import DiscogsSearch from "../components/DiscogsSearch.js"
 import { useAuth } from '../context/AuthContext.js'
 import { api } from "../services/api.js"
 
@@ -34,6 +35,8 @@ const Albums =()=> {
     const [totalPages, setTotalPages] = useState(1)
     const [total, setTotal] = useState(0)
     const [sort, setSort] = useState('title_asc')
+
+    const [showDiscogsSearch, setShowDiscogsSearch] = useState(false)
 
     const LIMIT = 20
 
@@ -168,6 +171,7 @@ const Albums =()=> {
                                 onChange={e => setSearchInput(e.target.value)}
                                 aria-label='Search albums by title, performer, or label'
                             />
+
                         </div>
 
                         {/* Format filter */}
@@ -269,6 +273,31 @@ const Albums =()=> {
                     )}
                 </form>
             </div>
+            {/* Discogs search toggle */}
+                    {isAuthenticated && (
+                        <div className='mb-3'>
+                            <button
+                                className='btn btn-outline-secondary btn-sm'
+                                onClick={() => setShowDiscogsSearch(prev => !prev)}
+                                aria-expanded={showDiscogsSearch}
+                            >
+                                {showDiscogsSearch
+                                    ? '✕ Close Discogs Search'
+                                    : '🔍 Can\'t find an album? Search Discogs'
+                                }
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Discogs search panel */}
+                    {isAuthenticated && showDiscogsSearch && (
+                        <DiscogsSearch
+                            onImportSuccess={() => {
+                                fetchAlbums()
+                                setShowDiscogsSearch(false)
+                            }}
+                        />
+                    )}
 
             {error && (
                 <div className='alert alert-danger' role='alert' aria-live='polite'>

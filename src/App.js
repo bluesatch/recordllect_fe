@@ -17,6 +17,7 @@ import EditPerformer from './pages/EditPerformer.js'
 import WantlistPage from './pages/WantlistPage.js'
 import FeedPage from './pages/FeedPage.js'
 import DiscoverPage from './pages/DiscoverPage.js'
+import AdminDashboard from './pages/AdminDashboard.js'
 
 const App =()=> {
     return (
@@ -24,6 +25,7 @@ const App =()=> {
             <Navbar />
             <Routes>
                 <Route path='/' element={ <Home /> } />
+                <Route path='/admin' element={<AdminDashboard />} />
                 <Route path='/login' element={ <Login /> } />
                 <Route path='/register' element={ <Register /> } />
                 <Route path='/albums' element={ <Albums /> } />

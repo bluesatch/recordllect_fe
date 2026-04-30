@@ -37,6 +37,11 @@ const AlbumDetail =()=> {
     const [wantlistPriority, setWantlistPriority] = useState('medium')
     const [showWantlistForm, setShowWantlistForm] = useState(false)
 
+    const [showReportForm, setShowReportForm] = useState(false)
+    const [reportReason, setReportReason] = useState('')
+    const [reportSubmitting, setReportSubmitting] = useState(false)
+    const [reportSubmitted, setReportSubmitted] = useState(false)
+
     // GET DATA
     // USE EFFECTS
     useEffect(()=> {
@@ -161,6 +166,24 @@ const AlbumDetail =()=> {
             console.error('Failed to remove from wantlist:', err)
         }
     }
+
+    const handleReport = async (e) => {
+    e.preventDefault()
+    if (!reportReason.trim()) return
+
+    setReportSubmitting(true)
+
+    try {
+        await api.post(`/albums/${id}/report`, { reason: reportReason })
+        setReportSubmitted(true)
+        setShowReportForm(false)
+        setReportReason('')
+    } catch (err) {
+        console.error('Failed to submit report:', err)
+    } finally {
+        setReportSubmitting(false)
+    }
+}
 
     if (loading) {
         return (
@@ -488,6 +511,71 @@ const AlbumDetail =()=> {
                     )}
                 </div>
             </div>
+            {/* Report album */}
+            {isAuthenticated && (
+                <div className='mt-3 mb-4'>
+                    {reportSubmitted ? (
+                        <p className='text-muted' style={{ fontSize: '0.85rem' }}>
+                            ✓ Report submitted. Thank you for helping keep the catalog clean.
+                        </p>
+                    ) : (
+                        <>
+                            <button
+                                className='btn btn-link btn-sm p-0 text-muted text-decoration-none'
+                                onClick={() => setShowReportForm(prev => !prev)}
+                                style={{ fontSize: '0.85rem' }}
+                            >
+                                🚩 Report this album
+                            </button>
+
+                            {showReportForm && (
+                                <div className='card mt-2 p-3'>
+                                    <form onSubmit={handleReport}>
+                                        <div className='mb-2'>
+                                            <label className='form-label' htmlFor='report-reason'>
+                                                Reason for reporting
+                                            </label>
+                                            <textarea
+                                                className='form-control form-control-sm'
+                                                id='report-reason'
+                                                rows={3}
+                                                value={reportReason}
+                                                onChange={e => setReportReason(e.target.value)}
+                                                placeholder='Describe the issue with this album...'
+                                                maxLength={500}
+                                                aria-label='Report reason'
+                                            />
+                                            <div className='form-text'>
+                                                {reportReason.length}/500
+                                            </div>
+                                        </div>
+                                        <div className='d-flex gap-2'>
+                                            <button
+                                                type='submit'
+                                                className='btn btn-danger btn-sm'
+                                                disabled={reportSubmitting || !reportReason.trim()}
+                                                aria-busy={reportSubmitting}
+                                            >
+                                                {reportSubmitting ? 'Submitting...' : 'Submit Report'}
+                                            </button>
+                                            <button
+                                                type='button'
+                                                className='btn btn-outline-secondary btn-sm'
+                                                onClick={() => {
+                                                    setShowReportForm(false)
+                                                    setReportReason('')
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
             <ReviewSection albumId={id} />
         </div>
     )

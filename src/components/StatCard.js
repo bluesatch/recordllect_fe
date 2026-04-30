@@ -19,7 +19,7 @@ const StatCard =({ value, label, onClick, isActive })=> {
             tabIndex={onClick ? 0 : undefined}
             onKeyDown={onClick ? e => e.key === 'Enter' && onClick() : undefined}
         >
-            <h3 className="display-6">{value ?? 0}</h3>
+            <h3 className="display-6" style={{ fontSize: '22px'}}>{value ?? 0}</h3>
             <p className="text-muted mb-0">{label}</p>
 
         </div>
