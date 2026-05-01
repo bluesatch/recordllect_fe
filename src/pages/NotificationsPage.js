@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.js'
 import { api } from '../services/api.js'
-import { getSocket } from '../services/socket.js'
 import NotificationCard from '../components/NotificationCard.js'
 import Pagination from '../components/Pagination.js'
 
@@ -13,7 +12,7 @@ import Pagination from '../components/Pagination.js'
 
 const NotificationsPage = () => {
 
-    const { isAuthenticated, loading: authLoading } = useAuth()
+    const { isAuthenticated, loading: authLoading, socket, setUnreadCount } = useAuth()
     const navigate = useNavigate()
 
     const [notifications, setNotifications] = useState([])
@@ -56,23 +55,6 @@ const NotificationsPage = () => {
         }
     }, [fetchNotifications, isAuthenticated])
 
-    // Listen for real-time notifications
-    useEffect(() => {
-        const socket = getSocket()
-        if (!socket) return
-
-        const handleNotification = (notification) => {
-            setNotifications(prev => [notification, ...prev])
-            setUnread(prev => prev + 1)
-        }
-
-        socket.on('notification', handleNotification)
-
-        return () => {
-            socket.off('notification', handleNotification)
-        }
-    }, [])
-
     const handleRead = async (notificationId) => {
         try {
             await api.put(`/notifications/${notificationId}/read`)
@@ -83,7 +65,7 @@ const NotificationsPage = () => {
                         : n
                 )
             )
-            setUnread(prev => Math.max(0, prev - 1))
+            setUnreadCount(prev => Math.max(0, prev - 1))
         } catch (err) {
             console.error('Failed to mark as read:', err)
         }
@@ -106,7 +88,7 @@ const NotificationsPage = () => {
             setNotifications(prev =>
                 prev.map(n => ({ ...n, is_read: 1 }))
             )
-            setUnread(0)
+            setUnreadCount(0)
         } catch (err) {
             console.error('Failed to mark all as read:', err)
         }

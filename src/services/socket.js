@@ -18,7 +18,7 @@ export const connectSocket = (token)=> {
     })
 
     socket.on('disconnect', ()=> {
-        console.log('WebSocket disconeected')
+        console.log('WebSocket disconnected')
     })
 
     socket.on('connect_error', (err)=> {

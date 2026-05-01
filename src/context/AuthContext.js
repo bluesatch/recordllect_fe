@@ -30,6 +30,8 @@ export const AuthProvider = ({ children })=> {
     const [ user, setUser ] = useState(null)
     const [ isAuthenticated, setIsAuthenticated ] = useState(false)
     const [ loading, setLoading ] = useState(true)
+    const [ socket, setSocket ] = useState(null)
+    const [unreadCount, setUnreadCount] = useState(0)
 
     /**
      * checkAuth - Runs once when the app first loads
@@ -40,6 +42,27 @@ export const AuthProvider = ({ children })=> {
      * is already logged in from a previous session.
      */
 
+    const connectUserSocket = async () => {
+        try {
+            const data = await api.get('/users/socket-token')
+            if (data.token) {
+                const connectedSocket = connectSocket(data.token)
+                setSocket(connectedSocket)
+            }
+        } catch (err) {
+            console.error('Failed to get socket token:', err)
+        }
+    }
+
+    const fetchUnreadCount = async ()=> {
+        try {
+            const data = await api.get(`/notifications?limit=1`)
+            setUnreadCount(data.unread || 0)
+        } catch (err) {
+            console.error('Failed to fetch unread count:', err)
+        }
+    }
+
     useEffect(()=> {
         const checkAuth = async ()=> {
             try {
@@ -48,13 +71,9 @@ export const AuthProvider = ({ children })=> {
                 if (data && data.users_id) {
                     setUser(data)
                     setIsAuthenticated(true)
-
+                    await fetchUnreadCount()
                     // Connect socket with cookie token 
-                    const cookieToken = document.cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1]
-
-                    if (cookieToken) {
-                        connectSocket(cookieToken)
-                    }
+                    await connectUserSocket()
                 }
             } catch (err) {
                 setUser(null)
@@ -66,6 +85,20 @@ export const AuthProvider = ({ children })=> {
 
         checkAuth()
     }, [])
+
+    useEffect(()=> {
+        if (!socket) return 
+
+        const handleNotification =()=> {
+            setUnreadCount(prev => prev + 1)
+        }
+
+        socket.on('notification', handleNotification)
+
+        return ()=> {
+            socket.off('notification', handleNotification)
+        }
+    }, [socket])
 
     /**
      * login - Authenticates the user
@@ -81,13 +114,10 @@ export const AuthProvider = ({ children })=> {
             const userData = await api.get('/users/me')
             setUser(userData)
             setIsAuthenticated(true)
-            
+            await fetchUnreadCount()
             // Connect socket after login 
-            const cookieToken = document.cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1]
-
-            if (cookieToken) {
-                connectSocket(cookieToken)
-            }
+            await connectUserSocket()
+            
         }
 
         return data
@@ -102,11 +132,13 @@ export const AuthProvider = ({ children })=> {
         await api.post('/users/logout', {})
         setUser(null)
         setIsAuthenticated(false)
+        setSocket(null)
         disconnectSocket()
+        setUnreadCount(0)
     }
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, socket, unreadCount, setUnreadCount }}>
             {children}
         </AuthContext.Provider>
     )

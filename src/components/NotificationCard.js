@@ -27,14 +27,14 @@ const NotificationCard = ({ notification, onRead, onDelete })=> {
         switch (notification.type) {
             case 'like_post':
             case 'comment':
-                return `/feed`
+                return `/posts/${notification.reference_id}`
             case 'like_comment':
             case 'reply':
-                return `/feed`
+                return `/posts/${notification.reference_id}`
             case 'follow':
                 return `/users/${notification.sender_id}`
             case 'repost':
-                return `/feed`
+                return `/posts/${notification.reference_id}`
             case 'wantlist_match':
                 return `/users/${notification.sender_id}/wantlist`
             default:

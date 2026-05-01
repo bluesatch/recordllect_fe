@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.js'
@@ -13,12 +13,12 @@ import PostForm from './PostForm.js'
  * - onPostUpdated: callback after post is edited or deleted
  */
 
-const PostCard = ({ post, onPostUpdated }) => {
+const PostCard = ({ post, onPostUpdated, defaultShowComments = false }) => {
 
     const { user, isAuthenticated } = useAuth()
 
     // STATE
-    const [showComments, setShowComments] = useState(false)
+    const [showComments, setShowComments] = useState(defaultShowComments)
     const [comments, setComments] = useState([])
     const [commentsLoading, setCommentsLoading] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
@@ -40,6 +40,7 @@ const PostCard = ({ post, onPostUpdated }) => {
         return then.toLocaleDateString()
     }
 
+    // Helper
     const fetchComments = async () => {
         setCommentsLoading(true)
         try {
@@ -51,6 +52,12 @@ const PostCard = ({ post, onPostUpdated }) => {
             setCommentsLoading(false)
         }
     }
+
+    useEffect(()=> {
+        if (defaultShowComments) {
+            fetchComments()
+        }
+    }, [defaultShowComments])
 
     // HANDLERS 
     const handleToggleComments = () => {

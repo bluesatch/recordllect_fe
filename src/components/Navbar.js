@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext.js"
-import { getSocket } from "../services/socket.js"
 import { api } from "../services/api.js"
-
-
 
 /**
  * Navbar - Global navigation component
@@ -18,40 +15,8 @@ import { api } from "../services/api.js"
 
 const Navbar =()=> {
 
-    const { user, isAuthenticated, logout } = useAuth()
+    const { user, isAuthenticated, logout, socket, unreadCount } = useAuth()
     const navigate = useNavigate()
-
-    const [unreadCount, setUnreadCount] = useState(0)
-
-    useEffect(()=> {
-        const fetchUnread = async ()=> {
-            if (!isAuthenticated) return 
-
-            try {
-                const data = await api.get(`/notifications?limit=1`)
-                setUnreadCount(data.unread || 0)
-            } catch (err) {
-                console.error('Failed to fetch unread count:', err)
-            }
-        }
-
-        fetchUnread()
-    }, [isAuthenticated])
-
-    useEffect(()=> {
-        const socket = getSocket()
-        if (!socket) return 
-
-        const handleNotification = ()=> {
-            setUnreadCount(prev => prev + 1)
-        }
-
-        socket.on('notification', handleNotification)
-
-        return ()=> {
-            socket.off('notification', handleNotification)
-        }
-    }, [isAuthenticated])
 
     const handleLogout = async ()=> {
         await logout()
