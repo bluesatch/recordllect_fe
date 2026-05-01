@@ -157,7 +157,12 @@ const AlbumGrid =({
                 <div className="card-body">
                     <h3 className="card-title h6">{album.title}</h3>
                     <p className="card-text text-muted mb-1">
-                        {album.performer_name}
+                        <Link
+                            className="text-decoration-none"
+                            to={`/performers/${album.performer_id}`}
+                        >
+                            {album.performer_name}
+                        </Link>
                     </p>
                     <p className="card-text text-muted mb-1">
                         <small>{album.release_year || '-'} | {album.format_name}</small>

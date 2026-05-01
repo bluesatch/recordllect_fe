@@ -229,7 +229,7 @@ const PerformerDetail =()=> {
                                         </span>
                                     </div>
                                 )}
-                                <div className='d-flex justify-content-between align-items-start w-100'>
+                                <div className='d-flex flex-column justify-content-between align-items-start w-100'>
                                     <h2 className='mb-0'>
                                         {performerName()}
                                     </h2>

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react"
 import { api } from "../services/api.js"
+import { connectSocket, disconnectSocket } from "../services/socket.js"
 
 /**
  * AuthContext => Global authentication state manager
@@ -47,6 +48,13 @@ export const AuthProvider = ({ children })=> {
                 if (data && data.users_id) {
                     setUser(data)
                     setIsAuthenticated(true)
+
+                    // Connect socket with cookie token 
+                    const cookieToken = document.cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1]
+
+                    if (cookieToken) {
+                        connectSocket(cookieToken)
+                    }
                 }
             } catch (err) {
                 setUser(null)
@@ -73,6 +81,13 @@ export const AuthProvider = ({ children })=> {
             const userData = await api.get('/users/me')
             setUser(userData)
             setIsAuthenticated(true)
+            
+            // Connect socket after login 
+            const cookieToken = document.cookie.split(';').find(c => c.trim().startsWith('token='))?.split('=')[1]
+
+            if (cookieToken) {
+                connectSocket(cookieToken)
+            }
         }
 
         return data
@@ -87,6 +102,7 @@ export const AuthProvider = ({ children })=> {
         await api.post('/users/logout', {})
         setUser(null)
         setIsAuthenticated(false)
+        disconnectSocket()
     }
 
     return (

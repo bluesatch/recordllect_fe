@@ -165,7 +165,7 @@ const TopEight = ({ userId, isOwnProfile, pendingAlbum, onPendingHandled, onCoun
 
         if (album) {
             return (
-                <div key={position} className="col">
+                <div key={position} className="col-6 col-md-3">
                     <div className="card h-100">
                         {album.album_image_url ? (
                             <img 
@@ -192,7 +192,11 @@ const TopEight = ({ userId, isOwnProfile, pendingAlbum, onPendingHandled, onCoun
                                 </Link>
                             </p>
                             <p className="text-muted mb-0" style={{ fontSize: '0.7rem'}}>
-                                {album.performer_name}
+                                <Link 
+                                    to={`/performers/${album.performer_id}`}
+                                >
+                                    {album.performer_name}
+                                </Link>
                             </p>
                         </div>
                         {isOwnProfile && (
@@ -346,7 +350,7 @@ const TopEight = ({ userId, isOwnProfile, pendingAlbum, onPendingHandled, onCoun
             )}
 
             {/* Eight slots */}
-            <div className="row row-cols-8 row-cols-md-8 g-2">
+            <div className="row">
                 {slots}
             </div>
 

@@ -1,5 +1,10 @@
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext.js"
+import { getSocket } from "../services/socket.js"
+import { api } from "../services/api.js"
+
+
 
 /**
  * Navbar - Global navigation component
@@ -15,6 +20,38 @@ const Navbar =()=> {
 
     const { user, isAuthenticated, logout } = useAuth()
     const navigate = useNavigate()
+
+    const [unreadCount, setUnreadCount] = useState(0)
+
+    useEffect(()=> {
+        const fetchUnread = async ()=> {
+            if (!isAuthenticated) return 
+
+            try {
+                const data = await api.get(`/notifications?limit=1`)
+                setUnreadCount(data.unread || 0)
+            } catch (err) {
+                console.error('Failed to fetch unread count:', err)
+            }
+        }
+
+        fetchUnread()
+    }, [isAuthenticated])
+
+    useEffect(()=> {
+        const socket = getSocket()
+        if (!socket) return 
+
+        const handleNotification = ()=> {
+            setUnreadCount(prev => prev + 1)
+        }
+
+        socket.on('notification', handleNotification)
+
+        return ()=> {
+            socket.off('notification', handleNotification)
+        }
+    }, [isAuthenticated])
 
     const handleLogout = async ()=> {
         await logout()
@@ -98,6 +135,20 @@ const Navbar =()=> {
                                             <span className='badge bg-warning text-dark ms-2'>
                                                 Admin
                                             </span>
+                                        )}
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link position-relative" to='/notifications'>
+                                        Notifications 
+                                        {unreadCount > 0 && (
+                                            <span 
+                                                className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                                style={{ fontSize: '0.65rem' }}
+                                            >
+                                                {unreadCount > 99 ? '99+' : unreadCount}
+                                            </span>
+
                                         )}
                                     </Link>
                                 </li>

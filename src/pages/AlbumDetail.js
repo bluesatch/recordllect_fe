@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.js'
 import { api } from '../services/api.js'
 
 import ReviewSection from '../components/ReviewSection.js'
+import TrackList from '../components/TrackList.js'
 
 /**
  * 
@@ -576,6 +577,11 @@ const AlbumDetail =()=> {
                     )}
                 </div>
             )}
+            <TrackList 
+                albumId={id}
+                discogsId={album.discogs_id}
+                isAdmin={user?.is_admin === 1}
+            />
             <ReviewSection albumId={id} />
         </div>
     )

@@ -18,6 +18,7 @@ import WantlistPage from './pages/WantlistPage.js'
 import FeedPage from './pages/FeedPage.js'
 import DiscoverPage from './pages/DiscoverPage.js'
 import AdminDashboard from './pages/AdminDashboard.js'
+import NotificationsPage from './pages/NotificationsPage.js'
 
 const App =()=> {
     return (
@@ -41,6 +42,7 @@ const App =()=> {
                 <Route path='/users/:id/wantlist' element={<WantlistPage />} />
                 <Route path ='/feed' element={<FeedPage />} />
                 <Route path='/discover' element={<DiscoverPage />} />
+                <Route path='/notifications' element={<NotificationsPage />} />
                 <Route path="*" element={ <NotFound /> } />
             </Routes>
         </>

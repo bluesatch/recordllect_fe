@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext.js"
 import { api } from "../services/api.js"
 
+import TrackList from "../components/TrackList.js"
+
 /**
  * 
  * EditAlbum - Edit album page
@@ -20,7 +22,7 @@ const EditAlbum =()=> {
 
     const { id } = useParams()
     const navigate = useNavigate()
-    const { isAuthenticated } = useAuth()
+    const { isAuthenticated, user } = useAuth()
 
     // STATE 
     const [album, setAlbum] = useState(null)
@@ -373,6 +375,13 @@ const EditAlbum =()=> {
                             </section>
                         </div>
                     </div>
+                    {album && (
+                        <TrackList 
+                            albumId={id}
+                            discogsId={album.discogs_id}
+                            isAdmin={user?.is_admin === 1}
+                        />
+                    )}
 
                     {/* Submit buttons */}
                     <div className='d-flex gap-2 mt-4 mb-5'>
